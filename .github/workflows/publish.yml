@@ -1,0 +1,22 @@
+name: Publish to AMO
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run publish
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.MOZILLA_ADDONS_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.MOZILLA_ADDONS_JWT_SECRET }}

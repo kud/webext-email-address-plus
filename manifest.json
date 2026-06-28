@@ -6,7 +6,10 @@
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
-      "id": "email-address-plus@kud.io"
+      "id": "email-address-plus@kud.io",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
   "browser_action": {
@@ -21,18 +24,12 @@
     "contextMenus"
   ],
   "background": {
-    "scripts": [
-      "src/background.js"
-    ]
+    "scripts": ["src/background.js"]
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "src/content.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"],
       "run_at": "document_idle"
     }
   ],
