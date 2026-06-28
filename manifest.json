@@ -2,13 +2,15 @@
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
-  "version": "5.3.0",
+  "version": "5.3.1",
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
       "id": "email-address-plus@kud.io",
       "data_collection_permissions": {
-        "required": ["none"]
+        "required": [
+          "none"
+        ]
       }
     }
   },
@@ -24,12 +26,18 @@
     "contextMenus"
   ],
   "background": {
-    "scripts": ["src/background.js"]
+    "scripts": [
+      "src/background.js"
+    ]
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["src/content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/content.js"
+      ],
       "run_at": "document_idle"
     }
   ],
