@@ -1,12 +1,9 @@
-/* Handle Browser API */
-const getBrowserAPI = () => {
-  if (typeof browser !== "undefined" && browser.browserAction) {
-    return browser
-  } else if (typeof chrome !== "undefined" && chrome.browserAction) {
-    return chrome
-  }
-  throw new Error("No browser API available")
-}
+const api = webext.api
+
+// `webext.api` resolves the namespace but deliberately erases which one it
+// resolved to, and openPopup below is the one place that difference matters:
+// it is callable from a browserAction click on Chrome and not on Firefox.
+const isChrome = () => typeof browser === "undefined"
 
 /* Handle Theme Detection and Icon Updates */
 const parseRGBColor = (colorString) => {
@@ -28,7 +25,6 @@ const calculateBrightness = (r, g, b) => {
 
 const updateIcon = async () => {
   try {
-    const api = getBrowserAPI()
     let isDark = false
 
     // Method 1: Try theme API (Firefox primarily)
@@ -115,7 +111,6 @@ const updateIcon = async () => {
   } catch (error) {
     console.error("Icon update failed:", error)
     try {
-      const api = getBrowserAPI()
       await api.browserAction.setIcon({ path: "src/icons/icon.svg" })
       console.log("Fallback to default icon")
     } catch (fallbackError) {
@@ -127,7 +122,6 @@ const updateIcon = async () => {
 // Initialize
 ;(async () => {
   try {
-    const api = getBrowserAPI()
 
     // Set initial icon
     await updateIcon()
@@ -211,14 +205,6 @@ const getHostnameByTab = (tab) => {
   }
 }
 
-const getStorageData = async (keys) => {
-  const api = getBrowserAPI()
-  if (api.storage) {
-    return await api.storage.local.get(keys)
-  }
-  throw new Error("Storage API not available")
-}
-
 const generateLabel = (hostname, domainMode) => {
   if (!hostname) return ""
 
@@ -280,21 +266,17 @@ const getLabeledEmailAddress = (
 const handleContextMenuClick = async (tab) => {
   try {
     const hostname = getHostnameByTab(tab)
-    const { email: emailAddress, domainMode } = await getStorageData([
-      "email",
-      "domainMode",
-    ])
-    const trimmedEmail = (emailAddress || "").trim()
+    const { email: emailAddress, domainMode } = await settings.get()
+    const trimmedEmail = emailAddress.trim()
 
     if (trimmedEmail && hostname) {
       const labeledEmail = getLabeledEmailAddress(
         trimmedEmail,
         hostname,
-        domainMode || "main",
+        domainMode,
       )
 
       // Send message to content script to fill the email field
-      const api = getBrowserAPI()
       try {
         await api.tabs.sendMessage(tab.id, {
           action: "fillEmailField",
@@ -305,7 +287,6 @@ const handleContextMenuClick = async (tab) => {
       }
     } else if (!trimmedEmail) {
       // Send message to show tooltip when no email is configured
-      const api = getBrowserAPI()
       try {
         await api.tabs.sendMessage(tab.id, {
           action: "showNoEmailTooltip",
@@ -323,21 +304,17 @@ const handleContextMenuClick = async (tab) => {
 const handleFillFocusedField = async (tab) => {
   try {
     const hostname = getHostnameByTab(tab)
-    const { email: emailAddress, domainMode } = await getStorageData([
-      "email",
-      "domainMode",
-    ])
-    const trimmedEmail = (emailAddress || "").trim()
+    const { email: emailAddress, domainMode } = await settings.get()
+    const trimmedEmail = emailAddress.trim()
 
     if (trimmedEmail && hostname) {
       const labeledEmail = getLabeledEmailAddress(
         trimmedEmail,
         hostname,
-        domainMode || "main",
+        domainMode,
       )
 
       // Send message to content script to fill the focused field
-      const api = getBrowserAPI()
       try {
         await api.tabs.sendMessage(tab.id, {
           action: "fillFocusedField",
@@ -348,7 +325,6 @@ const handleFillFocusedField = async (tab) => {
       }
     } else if (!trimmedEmail) {
       // Send message to show tooltip when no email is configured
-      const api = getBrowserAPI()
       try {
         await api.tabs.sendMessage(tab.id, {
           action: "showNoEmailTooltip",
@@ -365,14 +341,12 @@ const handleFillFocusedField = async (tab) => {
 
 const handleClick = async () => {
   try {
-    const { email: emailAddress } = await getStorageData(["email"])
-    const trimmedEmail = (emailAddress || "").trim()
+    const trimmedEmail = (await settings.get()).email.trim()
 
     if (trimmedEmail) {
       // Open popup programmatically (Chrome only)
       // The popup will handle email generation and copying
-      const api = getBrowserAPI()
-      if (api === chrome && chrome.browserAction?.openPopup) {
+      if (isChrome() && chrome.browserAction?.openPopup) {
         try {
           chrome.browserAction.openPopup()
         } catch (e) {
@@ -381,8 +355,7 @@ const handleClick = async () => {
       }
     } else {
       // Handle missing email - open popup for error display
-      const api = getBrowserAPI()
-      if (api === chrome && chrome.browserAction?.openPopup) {
+      if (isChrome() && chrome.browserAction?.openPopup) {
         try {
           chrome.browserAction.openPopup()
         } catch (e) {

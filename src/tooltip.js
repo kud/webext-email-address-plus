@@ -96,16 +96,6 @@
   // Apply theme before continuing
   await detectAndApplyTheme()
 
-  // Helper function for browser API compatibility
-  const getStorageData = async (keys) => {
-    if (typeof browser !== "undefined" && browser.storage) {
-      return await browser.storage.local.get(keys)
-    } else if (typeof chrome !== "undefined" && chrome.storage) {
-      return new Promise((resolve) => chrome.storage.local.get(keys, resolve))
-    }
-    throw new Error("No browser storage API available")
-  }
-
   const getActiveTab = async () => {
     const query = { active: true, currentWindow: true }
     if (typeof browser !== "undefined" && browser.tabs) {
@@ -118,9 +108,9 @@
 
   try {
     // Get email and domainMode from storage
-    const result = await getStorageData(["email", "domainMode"])
-    email = (result.email || "").trim()
-    domainMode = result.domainMode || "main"
+    const prefs = await settings.get()
+    email = prefs.email.trim()
+    domainMode = prefs.domainMode
 
     // Get the current tab's hostname
     const tabs = await getActiveTab()
@@ -198,8 +188,7 @@
 
   const saveEmailToHistory = async (emailAddress) => {
     try {
-      const result = await getStorageData(["emailHistory"])
-      let history = result.emailHistory || []
+      let history = (await settings.get()).emailHistory
 
       // Remove if already exists (move to front)
       history = history.filter((item) => item !== emailAddress)
@@ -212,12 +201,7 @@
         history = history.slice(0, MAX_HISTORY_ITEMS)
       }
 
-      // Save back to storage
-      if (typeof browser !== "undefined" && browser.storage) {
-        await browser.storage.local.set({ emailHistory: history })
-      } else if (typeof chrome !== "undefined" && chrome.storage) {
-        await chrome.storage.local.set({ emailHistory: history })
-      }
+      await settings.set({ emailHistory: history })
     } catch (error) {
       console.error("Failed to save email to history:", error)
     }
@@ -225,9 +209,7 @@
 
   const renderEmailHistory = async () => {
     try {
-      const result = await getStorageData(["emailHistory", "showHistory"])
-      const history = result.emailHistory || []
-      const showHistory = result.showHistory !== false // Default to true
+      const { emailHistory: history, showHistory } = await settings.get()
 
       const historySection = document.getElementById("history-section")
       const historyList = document.getElementById("history-list")
@@ -351,12 +333,7 @@
   const settingsBtn = document.getElementById("settings-btn")
   if (settingsBtn) {
     settingsBtn.addEventListener("click", () => {
-      // Open options page
-      if (typeof browser !== "undefined" && browser.runtime) {
-        browser.runtime.openOptionsPage()
-      } else if (typeof chrome !== "undefined" && chrome.runtime) {
-        chrome.runtime.openOptionsPage()
-      }
+      webext.api.runtime.openOptionsPage()
     })
   }
 

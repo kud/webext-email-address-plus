@@ -37,19 +37,8 @@ const autoSave = async () => {
     return // Don't save invalid email
   }
 
-  // Get browser API with compatibility
-  const getBrowserAPI = () => {
-    if (typeof browser !== "undefined" && browser.storage) {
-      return browser
-    } else if (typeof chrome !== "undefined" && chrome.storage) {
-      return chrome
-    }
-    throw new Error("No browser storage API available")
-  }
-
   try {
-    const api = getBrowserAPI()
-    await api.storage.local.set({
+    await settings.set({
       email: emailValue,
       domainMode: domainModeSelect.value,
       showHistory: showHistoryCheckbox.checked,
@@ -72,23 +61,8 @@ const debouncedAutoSave = () => {
 
 const restoreOptions = async () => {
   try {
-    const getBrowserAPI = () => {
-      if (typeof browser !== "undefined" && browser.storage) {
-        return browser
-      } else if (typeof chrome !== "undefined" && chrome.storage) {
-        return chrome
-      }
-      throw new Error("No browser storage API available")
-    }
-
-    const api = getBrowserAPI()
     const { email, domainMode, showHistory, showFloatingIcon } =
-      await api.storage.local.get([
-        "email",
-        "domainMode",
-        "showHistory",
-        "showFloatingIcon",
-      ])
+      await settings.get()
 
     const emailInput = document.querySelector("#email")
     const domainModeSelect = document.querySelector("#domainMode")
@@ -102,10 +76,10 @@ const restoreOptions = async () => {
       domainModeSelect.value = domainMode
     }
     if (showHistoryCheckbox) {
-      showHistoryCheckbox.checked = showHistory !== false // Default to true
+      showHistoryCheckbox.checked = showHistory
     }
     if (showFloatingIconCheckbox) {
-      showFloatingIconCheckbox.checked = showFloatingIcon !== false // Default to true
+      showFloatingIconCheckbox.checked = showFloatingIcon
     }
 
     // Update preview after restoring values

@@ -1,17 +1,6 @@
 // Content script for email field detection and filling
 ;(() => {
-  // Listen for messages from background script
-  const getBrowserAPI = () => {
-    if (typeof browser !== "undefined" && browser.runtime) {
-      return browser
-    } else if (typeof chrome !== "undefined" && chrome.runtime) {
-      return chrome
-    }
-    return null
-  }
-
-  const api = getBrowserAPI()
-  if (!api) return
+  const api = webext.api
 
   // Find email input fields on the page
   const findEmailInputs = () => {
@@ -324,16 +313,14 @@
           // Get current tab info and generate labeled email directly
           const hostname = window.location.hostname
 
-          // Get email settings from storage
-          const { email: emailAddress, domainMode } =
-            await api.storage.local.get(["email", "domainMode"])
-          const trimmedEmail = (emailAddress || "").trim()
+          const { email: emailAddress, domainMode } = await settings.get()
+          const trimmedEmail = emailAddress.trim()
 
           if (trimmedEmail && hostname) {
             const labeledEmail = generateLabeledEmail(
               trimmedEmail,
               hostname,
-              domainMode || "main",
+              domainMode,
             )
             fillEmailField(currentFocusedInput, labeledEmail)
           } else if (!trimmedEmail) {
@@ -449,15 +436,8 @@
   document.addEventListener("focusin", async (event) => {
     const target = event.target
     if (target.tagName === "INPUT" && target.type === "email") {
-      // Check if floating icon is enabled in settings
       try {
-        const { showFloatingIcon: iconEnabled } = await api.storage.local.get([
-          "showFloatingIcon",
-        ])
-        if (iconEnabled !== false) {
-          // Default to true if not set
-          showFloatingIcon(target)
-        }
+        if ((await settings.get()).showFloatingIcon) showFloatingIcon(target)
       } catch (error) {
         console.error("Failed to check floating icon setting:", error)
         // Default to showing the icon if there's an error
