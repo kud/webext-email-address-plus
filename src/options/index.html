@@ -1,62 +1,55 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="./index.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Email Address Plus — Options</title>
+    <link rel="stylesheet" href="../vendor/tokens.css" />
+    <link rel="stylesheet" href="../vendor/webext-ui.css" />
+    <link rel="stylesheet" href="./index.css" />
   </head>
 
-  <body>
-    <div class="prefs-form">
-      <div class="form-group">
-        <label for="email"
-          >Email address <span class="required">*</span>:</label
-        >
+  <body class="page">
+    <div class="card stack">
+      <label class="field">
+        <span>Email address <span class="required">*</span></span>
         <input type="email" id="email" required />
-      </div>
-      <div class="form-group"></div>
-      <div class="form-group">
-        <label for="domainMode">Domain label mode:</label>
+      </label>
+
+      <label class="field">
+        <span>Domain label mode</span>
         <select id="domainMode">
-          <option value="main">
-            Main domain <span class="example">(example.com)</span>
-          </option>
-          <option value="short">
-            Short <span class="example">(example)</span>
-          </option>
-          <option value="full">
-            Full domain <span class="example">(www.example.com)</span>
-          </option>
+          <option value="main">Main domain (example.com)</option>
+          <option value="short">Short (example)</option>
+          <option value="full">Full domain (www.example.com)</option>
         </select>
-      </div>
-      
-      <div class="form-group" id="preview-group" style="display: none;">
-        <label>Preview:</label>
+      </label>
+
+      <div class="field" id="preview-group" hidden>
+        <span>Preview</span>
         <div id="email-preview" class="email-preview"></div>
       </div>
-      
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="showHistory" class="checkbox-input">
-          Show recent emails history in popup
-        </label>
-      </div>
-      
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="showFloatingIcon" class="checkbox-input">
-          Show floating icon on input fields
-        </label>
-      </div>
-      
-      <div id="save-status" class="save-status" style="display: none;">
-        <span class="save-indicator">Saved</span>
+
+      <label class="field-inline">
+        <input type="checkbox" id="showHistory" class="checkbox-input" />
+        Show recent emails history in popup
+      </label>
+
+      <label class="field-inline">
+        <input type="checkbox" id="showFloatingIcon" class="checkbox-input" />
+        Show floating icon on input fields
+      </label>
+
+      <div id="save-status" class="save-status" hidden>
+        <span class="save-indicator badge badge-success">Saved</span>
       </div>
     </div>
 
-    <div class="Spoiler">
+    <p class="spoiler">
       <span class="required">*</span> The email address is only saved on this
       computer.
-    </div>
+    </p>
 
     <script src="index.js"></script>
   </body>

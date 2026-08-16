@@ -1,93 +1,86 @@
-body {
-  font-family: "Segoe UI", "Inter", "Roboto", Arial, sans-serif;
-  background: #f9f9fb;
-  margin: 0;
-  padding: 0;
+/* Email Address Plus — options page identity.
+ *
+ * Everything shared lives in the vendored design system at src/vendor/
+ * (@kud/webext-ui). Re-sync with:
+ *   npx @kud/webext-ui@latest sync src/vendor/
+ *
+ * Scope note: tooltip.css is deliberately NOT on the system. It carries two
+ * competing dark-mode mechanisms — a prefers-color-scheme block and a
+ * [data-theme] block with the same values repeated — and deciding which wins
+ * is a question about the JS that sets the attribute, not about CSS. Migrating
+ * it here would have turned a clean change into a debugging session.
+ */
+
+:root {
+  --accent: #0060df;
+  --accent-fg: #ffffff; /* 5.62:1 on --accent */
+  --page-width: 420px;
 }
 
-.prefs-form {
-  background: #fff;
-  max-width: 420px;
-  margin: 48px auto 0 auto;
-  padding: 32px 36px 28px 36px;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px 0 rgba(60, 60, 60, 0.07);
-  border: 1px solid #e0e0e6;
-}
-
-.form-group {
-  margin-bottom: 22px;
-}
-
-label {
-  font-weight: 500;
-  display: block;
-  margin-bottom: 6px;
-  color: #202124;
-  font-size: 1em;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #4f8cff;
+    --accent-fg: #1c1b22; /* 5.31:1 on --accent */
+  }
 }
 
 .required {
-  color: #d70022;
-  font-size: 1em;
-  vertical-align: middle;
+  color: var(--danger);
 }
 
 .example {
-  color: #888;
-  font-size: 0.95em;
+  color: var(--muted);
   font-style: italic;
 }
 
-input[type="email"],
-select {
-  border-radius: 6px;
-  border: 1.5px solid #c0c0c0;
-  color: #222;
-  padding: 8px 12px;
-  width: 100%;
-  font-size: 1em;
-  box-sizing: border-box;
-  margin-top: 2px;
-  background: #f9f9fb;
-  transition: border-color 0.2s;
-}
-
-input[type="email"]:focus,
-select:focus {
-  border-color: #0060df;
-  outline: none;
-}
-
-input[type="email"]:invalid {
-  border: 1.5px solid #d70022;
-  box-shadow: none;
-}
-
+/* JS toggles .invalid after its own check; the system's :user-invalid covers
+   the browser's native validation. Both had to keep working. */
 input[type="email"].invalid {
-  border: 1.5px solid #d70022 !important;
-  background: #fff0f3;
-  box-shadow: 0 0 0 2px #ffd6e0;
+  border-color: var(--danger);
+}
+
+.email-preview {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  word-break: break-all;
+  line-height: var(--line-base);
+}
+
+.preview-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.preview-item + .preview-item {
+  margin-top: var(--space-2);
+}
+
+.preview-label {
+  color: var(--muted);
+  min-width: 80px;
+}
+
+.preview-email {
+  font-weight: 600;
 }
 
 .save-status {
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin-top: 16px;
+  margin-top: var(--space-4);
 }
 
 .save-indicator {
-  color: #27ae60;
-  font-size: 0.9em;
-  font-weight: 500;
-  padding: 4px 12px;
-  background: #e8f5e8;
-  border: 1px solid #c3e6c3;
-  border-radius: 4px;
   opacity: 0;
   transform: translateY(-10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity var(--dur-slow) var(--ease),
+    transform var(--dur-slow) var(--ease);
 }
 
 .save-indicator.show {
@@ -95,120 +88,8 @@ input[type="email"].invalid {
   transform: translateY(0);
 }
 
-.email-preview {
-  background: #f0f8ff;
-  border: 1px solid #b3d9ff;
-  border-radius: 6px;
-  padding: 12px;
-  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
-  font-size: 0.95em;
-  color: #2c5aa0;
-  word-break: break-all;
-  line-height: 1.4;
-}
-
-.preview-item {
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.preview-item:last-child {
-  margin-bottom: 0;
-}
-
-.preview-label {
-  font-size: 0.85em;
-  color: #666;
-  font-weight: 500;
-  min-width: 80px;
-}
-
-.preview-email {
-  font-weight: 600;
-  color: #2c5aa0;
-}
-
-.checkbox-input {
-  margin-right: 8px;
-  margin-left: 0;
-  width: auto;
-  cursor: pointer;
-}
-
-.checkbox-input + label,
-label:has(.checkbox-input) {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 400;
-}
-
-.Spoiler {
-  font-style: italic;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  color: #666;
+.spoiler {
+  color: var(--muted);
   text-align: center;
-  font-size: 0.97em;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #181a1b;
-    color: #f4f4f4;
-  }
-  .prefs-form {
-    background: #23272f;
-    border: 1px solid #23272f;
-    box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.18);
-  }
-  label {
-    color: #f4f4f4;
-  }
-  input[type="email"],
-  select {
-    background: #23272f;
-    color: #f4f4f4;
-    border: 1.5px solid #444a57;
-  }
-  input[type="email"]:focus,
-  select:focus {
-    border-color: #4f8cff;
-  }
-  input[type="email"].invalid {
-    background: #3a2327;
-    border: 1.5px solid #d70022 !important;
-    box-shadow: 0 0 0 2px #4f1a1a;
-  }
-  .save-btn {
-    background-color: #4f8cff;
-    color: #fff;
-  }
-  .save-btn:hover {
-    background: #2563eb;
-  }
-  .email-preview {
-    background: #2a3441;
-    border: 1px solid #4f5b69;
-    color: #7db3f0;
-  }
-  .preview-label {
-    color: #b0b0b0;
-  }
-  .preview-email {
-    color: #7db3f0;
-  }
-  .checkbox-input {
-    accent-color: #4f8cff;
-  }
-  .save-indicator {
-    color: #81c784;
-    background: #1a2e1a;
-    border: 1px solid #4caf50;
-  }
-  .Spoiler {
-    color: #b0b0b0;
-  }
+  font-style: italic;
 }
