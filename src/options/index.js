@@ -61,8 +61,16 @@ const debouncedAutoSave = () => {
 
 const restoreOptions = async () => {
   try {
-    const { email, domainMode, showHistory, showFloatingIcon } =
-      await settings.get()
+    // Falling back to the declared defaults rather than letting the catch below
+    // leave every control at its HTML state — which renders as "everything off"
+    // for two settings that default on, and looks like saved data rather than a
+    // failed read.
+    const { email, domainMode, showHistory, showFloatingIcon } = await settings
+      .get()
+      .catch((error) => {
+        console.error("Failed to read options, showing defaults:", error)
+        return settings.defaults
+      })
 
     const emailInput = document.querySelector("#email")
     const domainModeSelect = document.querySelector("#domainMode")

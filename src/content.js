@@ -187,35 +187,98 @@
         if (hostnameArr.length >= 2) {
           // More comprehensive public suffix detection
           const tld = hostnameArr[hostnameArr.length - 1]
-          const sld = hostnameArr.length >= 3 ? hostnameArr[hostnameArr.length - 2] : null
-          
+          const sld =
+            hostnameArr.length >= 3 ? hostnameArr[hostnameArr.length - 2] : null
+
           // Common patterns for 3-part TLDs (country code + type)
-          const needsThreeParts = hostnameArr.length >= 3 && (
+          const needsThreeParts =
+            hostnameArr.length >= 3 &&
             // UK domains
-            (tld === "uk" && ["co", "org", "net", "gov", "edu", "ac", "police", "sch", "nhs"].includes(sld)) ||
-            // Australian domains  
-            (tld === "au" && ["com", "org", "net", "gov", "edu", "asn", "id"].includes(sld)) ||
-            // New Zealand domains
-            (tld === "nz" && ["co", "org", "net", "gov", "edu", "ac", "school", "cri"].includes(sld)) ||
-            // Canadian domains
-            (tld === "ca" && ["ab", "bc", "mb", "nb", "nl", "ns", "nt", "nu", "on", "pe", "qc", "sk", "yk"].includes(sld)) ||
-            // Japanese domains
-            (tld === "jp" && ["co", "or", "ne", "ac", "ad", "ed", "go", "gr"].includes(sld)) ||
-            // South African domains
-            (tld === "za" && ["co", "org", "net", "gov", "edu", "ac", "web"].includes(sld)) ||
-            // Brazilian domains
-            (tld === "br" && ["com", "org", "net", "gov", "edu", "mil"].includes(sld)) ||
-            // Indian domains
-            (tld === "in" && ["co", "org", "net", "gov", "edu", "ac", "res", "mil"].includes(sld)) ||
-            // Chinese domains
-            (tld === "cn" && ["com", "org", "net", "gov", "edu", "ac"].includes(sld)) ||
-            // German state domains
-            (tld === "de" && hostnameArr.length >= 4) ||
-            // Other common patterns
-            (["com", "org", "net", "gov", "edu", "mil", "int"].includes(sld) && 
-             !["com", "org", "net", "gov", "edu", "mil", "int", "info", "biz"].includes(tld))
-          )
-          
+            ((tld === "uk" &&
+              [
+                "co",
+                "org",
+                "net",
+                "gov",
+                "edu",
+                "ac",
+                "police",
+                "sch",
+                "nhs",
+              ].includes(sld)) ||
+              // Australian domains
+              (tld === "au" &&
+                ["com", "org", "net", "gov", "edu", "asn", "id"].includes(
+                  sld,
+                )) ||
+              // New Zealand domains
+              (tld === "nz" &&
+                [
+                  "co",
+                  "org",
+                  "net",
+                  "gov",
+                  "edu",
+                  "ac",
+                  "school",
+                  "cri",
+                ].includes(sld)) ||
+              // Canadian domains
+              (tld === "ca" &&
+                [
+                  "ab",
+                  "bc",
+                  "mb",
+                  "nb",
+                  "nl",
+                  "ns",
+                  "nt",
+                  "nu",
+                  "on",
+                  "pe",
+                  "qc",
+                  "sk",
+                  "yk",
+                ].includes(sld)) ||
+              // Japanese domains
+              (tld === "jp" &&
+                ["co", "or", "ne", "ac", "ad", "ed", "go", "gr"].includes(
+                  sld,
+                )) ||
+              // South African domains
+              (tld === "za" &&
+                ["co", "org", "net", "gov", "edu", "ac", "web"].includes(
+                  sld,
+                )) ||
+              // Brazilian domains
+              (tld === "br" &&
+                ["com", "org", "net", "gov", "edu", "mil"].includes(sld)) ||
+              // Indian domains
+              (tld === "in" &&
+                ["co", "org", "net", "gov", "edu", "ac", "res", "mil"].includes(
+                  sld,
+                )) ||
+              // Chinese domains
+              (tld === "cn" &&
+                ["com", "org", "net", "gov", "edu", "ac"].includes(sld)) ||
+              // German state domains
+              (tld === "de" && hostnameArr.length >= 4) ||
+              // Other common patterns
+              (["com", "org", "net", "gov", "edu", "mil", "int"].includes(
+                sld,
+              ) &&
+                ![
+                  "com",
+                  "org",
+                  "net",
+                  "gov",
+                  "edu",
+                  "mil",
+                  "int",
+                  "info",
+                  "biz",
+                ].includes(tld)))
+
           if (needsThreeParts) {
             label = hostnameArr.slice(-3).join(".")
           } else {
@@ -293,7 +356,8 @@
     icon.addEventListener("mouseenter", () => {
       icon.style.opacity = "1"
       icon.style.transform = "scale(1.15)"
-      icon.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.5), 0 0 0 2px rgba(59, 130, 246, 0.2)"
+      icon.style.boxShadow =
+        "0 4px 12px rgba(59, 130, 246, 0.5), 0 0 0 2px rgba(59, 130, 246, 0.2)"
       icon.style.borderColor = "#60a5fa"
     })
 
@@ -436,13 +500,13 @@
   document.addEventListener("focusin", async (event) => {
     const target = event.target
     if (target.tagName === "INPUT" && target.type === "email") {
-      try {
-        if ((await settings.get()).showFloatingIcon) showFloatingIcon(target)
-      } catch (error) {
-        console.error("Failed to check floating icon setting:", error)
-        // Default to showing the icon if there's an error
-        showFloatingIcon(target)
-      }
+      const { showFloatingIcon: enabled } = await settings
+        .get()
+        .catch((error) => {
+          console.error("Failed to check floating icon setting:", error)
+          return settings.defaults
+        })
+      if (enabled) showFloatingIcon(target)
     }
   })
 

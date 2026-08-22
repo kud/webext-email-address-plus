@@ -96,16 +96,6 @@
   // Apply theme before continuing
   await detectAndApplyTheme()
 
-  const getActiveTab = async () => {
-    const query = { active: true, currentWindow: true }
-    if (typeof browser !== "undefined" && browser.tabs) {
-      return await browser.tabs.query(query)
-    } else if (typeof chrome !== "undefined" && chrome.tabs) {
-      return new Promise((resolve) => chrome.tabs.query(query, resolve))
-    }
-    throw new Error("No browser tabs API available")
-  }
-
   try {
     // Get email and domainMode from storage
     const prefs = await settings.get()
@@ -113,7 +103,10 @@
     domainMode = prefs.domainMode
 
     // Get the current tab's hostname
-    const tabs = await getActiveTab()
+    const tabs = await webext.invoke(webext.api.tabs, "query", {
+      active: true,
+      currentWindow: true,
+    })
     if (tabs?.[0]?.url) {
       try {
         const url = new URL(tabs[0].url)
@@ -154,14 +147,16 @@
       case "main":
         if (hostnameArr.length >= 2) {
           // Handle common ccTLD patterns like .co.uk, .com.au, etc.
-          if (hostnameArr.length >= 3 && 
-              (hostnameArr[hostnameArr.length - 2] === "co" || 
-               hostnameArr[hostnameArr.length - 2] === "com" || 
-               hostnameArr[hostnameArr.length - 2] === "org" || 
-               hostnameArr[hostnameArr.length - 2] === "net" || 
-               hostnameArr[hostnameArr.length - 2] === "gov" || 
-               hostnameArr[hostnameArr.length - 2] === "edu" || 
-               hostnameArr[hostnameArr.length - 2] === "ac")) {
+          if (
+            hostnameArr.length >= 3 &&
+            (hostnameArr[hostnameArr.length - 2] === "co" ||
+              hostnameArr[hostnameArr.length - 2] === "com" ||
+              hostnameArr[hostnameArr.length - 2] === "org" ||
+              hostnameArr[hostnameArr.length - 2] === "net" ||
+              hostnameArr[hostnameArr.length - 2] === "gov" ||
+              hostnameArr[hostnameArr.length - 2] === "edu" ||
+              hostnameArr[hostnameArr.length - 2] === "ac")
+          ) {
             label = hostnameArr.slice(-3).join(".")
           } else {
             label = hostnameArr.slice(-2).join(".")
