@@ -12,16 +12,7 @@
  */
 
 :root {
-  --accent: #0060df;
-  --accent-fg: #ffffff; /* 5.62:1 on --accent */
   --page-width: 420px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --accent: #4f8cff;
-    --accent-fg: #1c1b22; /* 5.31:1 on --accent */
-  }
 }
 
 .required {
