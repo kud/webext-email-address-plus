@@ -1,3 +1,9 @@
+import "@kud/webext-ui/tokens.css"
+import "@kud/webext-ui/webext-ui.css"
+import "../../assets/theme.css"
+import "./index.css"
+import { settings } from "../../utils/settings"
+
 // Auto-save functionality
 let saveTimeout = null
 

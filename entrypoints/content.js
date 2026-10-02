@@ -1,7 +1,9 @@
-// Content script for email field detection and filling
-;(() => {
-  const api = webext.api
+import { api } from "@kud/webext"
+import { defineContentScript } from "wxt/utils/define-content-script"
+import { settings } from "../utils/settings"
 
+// Content script for email field detection and filling
+const main = () => {
   // Find email input fields on the page
   const findEmailInputs = () => {
     const emailInputs = []
@@ -531,4 +533,10 @@
       positionFloatingIcon(currentFocusedInput)
     }
   })
-})()
+}
+
+export default defineContentScript({
+  matches: ["<all_urls>"],
+  runAt: "document_idle",
+  main,
+})

@@ -1,6 +1,8 @@
-const api = webext.api
+import { api } from "@kud/webext"
+import { defineBackground } from "wxt/utils/define-background"
+import { settings } from "../utils/settings"
 
-// `webext.api` resolves the namespace but deliberately erases which one it
+// `api` resolves the namespace but deliberately erases which one it
 // resolved to, and openPopup below is the one place that difference matters:
 // it is callable from a browserAction click on Chrome and not on Firefox.
 const isChrome = () => typeof browser === "undefined"
@@ -96,7 +98,7 @@ const updateIcon = async () => {
       }
     }
 
-    const iconPath = isDark ? "src/icons/icon-dark.svg" : "src/icons/icon.svg"
+    const iconPath = isDark ? "icons/icon-dark.svg" : "icons/icon.svg"
     console.log("Final decision - Using icon:", iconPath, "isDark:", isDark)
 
     await api.browserAction.setIcon({
@@ -111,7 +113,7 @@ const updateIcon = async () => {
   } catch (error) {
     console.error("Icon update failed:", error)
     try {
-      await api.browserAction.setIcon({ path: "src/icons/icon.svg" })
+      await api.browserAction.setIcon({ path: "icons/icon.svg" })
       console.log("Fallback to default icon")
     } catch (fallbackError) {
       console.error("Fallback icon update failed:", fallbackError)
@@ -120,9 +122,8 @@ const updateIcon = async () => {
 }
 
 // Initialize
-;(async () => {
+const initialize = async () => {
   try {
-
     // Set initial icon
     await updateIcon()
 
@@ -181,7 +182,7 @@ const updateIcon = async () => {
   } catch (error) {
     console.error("Extension initialization failed:", error)
   }
-})()
+}
 
 /* Handle Click */
 const getHostnameByTab = (tab) => {
@@ -367,3 +368,7 @@ const handleClick = async () => {
     console.error("Handle click failed:", error)
   }
 }
+
+export default defineBackground(() => {
+  initialize()
+})

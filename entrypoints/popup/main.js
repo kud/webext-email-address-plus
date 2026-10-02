@@ -1,4 +1,9 @@
-// tooltip.js
+import { api, invoke } from "@kud/webext"
+import "@kud/webext-ui/tokens.css"
+import "@kud/webext-ui/webext-ui.css"
+import "../../assets/theme.css"
+import "./tooltip.css"
+import { settings } from "../../utils/settings"
 ;(async function () {
   const title = document.getElementById("card-title")
   const subtitle = document.getElementById("card-subtitle")
@@ -19,7 +24,7 @@
     domainMode = prefs.domainMode
 
     // Get the current tab's hostname
-    const tabs = await webext.invoke(webext.api.tabs, "query", {
+    const tabs = await invoke(api.tabs, "query", {
       active: true,
       currentWindow: true,
     })
@@ -247,7 +252,7 @@
   const settingsBtn = document.getElementById("settings-btn")
   if (settingsBtn) {
     settingsBtn.addEventListener("click", () => {
-      webext.api.runtime.openOptionsPage()
+      api.runtime.openOptionsPage()
     })
   }
 

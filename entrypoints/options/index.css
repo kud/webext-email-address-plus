@@ -1,10 +1,9 @@
 /* Email Address Plus — options page identity.
  *
- * Everything shared lives in the vendored design system at src/vendor/
- * (@kud/webext-ui). Re-sync with:
- *   npx @kud/webext-ui@latest sync src/vendor/
+ * Everything shared comes from the @kud/webext-ui npm package, imported by
+ * main.js ahead of this file.
  *
- * Scope note: the popup (tooltip.html) now also uses the system. tooltip.css
+ * Scope note: the popup (entrypoints/popup) now also uses the system. tooltip.css
  * holds only its local remainder (status error colour, history email style,
  * success-checkmark animation).
  */
