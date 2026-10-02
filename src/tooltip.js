@@ -12,90 +12,6 @@
   let domainMode = "main"
   let hostname = ""
 
-  // Helper functions for theme detection
-  const parseRGBColor = (colorString) => {
-    const rgbMatch = colorString.match(/rgba?\(([^)]+)\)/)
-    if (!rgbMatch) return null
-    const values = rgbMatch[1].split(",").map((v) => parseFloat(v.trim()))
-    return values.length >= 3 ? [values[0], values[1], values[2]] : null
-  }
-
-  const calculateBrightness = (r, g, b) => (r * 299 + g * 587 + b * 114) / 1000
-
-  const isColorDark = (colorString) => {
-    if (colorString.includes("rgb(")) {
-      const rgbValues = parseRGBColor(colorString)
-      if (rgbValues) {
-        const [r, g, b] = rgbValues
-        return calculateBrightness(r, g, b) < 128
-      }
-    } else if (colorString.includes("#")) {
-      const hex = colorString.replace("#", "")
-      const r = parseInt(hex.substr(0, 2), 16)
-      const g = parseInt(hex.substr(2, 2), 16)
-      const b = parseInt(hex.substr(4, 2), 16)
-      return calculateBrightness(r, g, b) < 128
-    }
-    return false
-  }
-
-  const applyTheme = (isDark) => {
-    if (isDark) {
-      document.documentElement.setAttribute("data-theme", "dark")
-      document.body.classList.add("dark-theme")
-      document.body.classList.remove("light-theme")
-    } else {
-      document.documentElement.setAttribute("data-theme", "light")
-      document.body.classList.add("light-theme")
-      document.body.classList.remove("dark-theme")
-    }
-    console.log("Final theme applied:", isDark ? "dark" : "light")
-  }
-
-  // Theme detection function
-  const detectAndApplyTheme = async () => {
-    try {
-      let isDark = false
-
-      // Method 1: Check system preference first (most reliable)
-      if (window.matchMedia) {
-        isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-        console.log("System preference isDark:", isDark)
-      }
-
-      // Method 2: Try browser theme API (Firefox) - override if available
-      if (typeof browser !== "undefined" && browser.theme) {
-        try {
-          const theme = await browser.theme.getCurrent()
-          if (theme?.colors) {
-            const toolbarColor =
-              theme.colors.toolbar ||
-              theme.colors.frame ||
-              theme.colors.tab_background_text
-            if (toolbarColor) {
-              const themeIsDark = isColorDark(toolbarColor)
-              isDark = themeIsDark
-              console.log("Browser theme override isDark:", isDark)
-            }
-          }
-        } catch (e) {
-          console.log("Browser theme API not available or failed:", e)
-        }
-      }
-
-      applyTheme(isDark)
-    } catch (error) {
-      console.error("Theme detection failed:", error)
-      // Fallback to system preference
-      const fallbackDark =
-        window.matchMedia?.("(prefers-color-scheme: dark)").matches || false
-      applyTheme(fallbackDark)
-    }
-  }
-
-  // Apply theme before continuing
-  await detectAndApplyTheme()
-
   try {
     // Get email and domainMode from storage
     const prefs = await settings.get()
@@ -210,7 +126,7 @@
       const historyList = document.getElementById("history-list")
 
       if (!showHistory || history.length === 0) {
-        historySection.style.display = "none"
+        historySection.hidden = true
         return
       }
 
@@ -218,15 +134,18 @@
 
       history.forEach((email) => {
         const item = document.createElement("div")
-        item.className = "history-item"
+        item.className = "row"
 
         const emailSpan = document.createElement("span")
         emailSpan.className = "history-email"
         emailSpan.textContent = email
 
         const copyBtn = document.createElement("button")
-        copyBtn.className = "history-copy-btn"
-        copyBtn.textContent = "Copy"
+        copyBtn.className = "btn"
+        const btnLabel = document.createElement("span")
+        btnLabel.setAttribute("aria-live", "polite")
+        btnLabel.textContent = "Copy"
+        copyBtn.appendChild(btnLabel)
         copyBtn.addEventListener("click", async () => {
           try {
             if (navigator.clipboard && window.isSecureContext) {
@@ -239,9 +158,9 @@
               document.execCommand("copy")
               document.body.removeChild(textArea)
             }
-            copyBtn.textContent = "✓"
+            btnLabel.textContent = "Copied"
             setTimeout(() => {
-              copyBtn.textContent = "Copy"
+              btnLabel.textContent = "Copy"
             }, 1000)
           } catch (e) {
             console.error("Failed to copy from history:", e)
@@ -253,7 +172,7 @@
         historyList.appendChild(item)
       })
 
-      historySection.style.display = "block"
+      historySection.hidden = false
     } catch (error) {
       console.error("Failed to render email history:", error)
     }
