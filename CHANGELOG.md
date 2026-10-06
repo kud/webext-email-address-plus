@@ -5,40 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.0] - 2026-10-07
+
+### Changed
+
+- Popup and options page redesigned as a Nova panel. The popup shows the copied address with its +tag highlighted, and the 4-second auto-close now pauses while you hover or focus it, with a progress bar that follows. ([4f4f68d](https://github.com/kud/webext-email-address-plus/commit/4f4f68d736a9c2757891c703add0ac7359829ef4))
+- Options page has a fresh layout; settings, values and auto-save work as before. ([4f4f68d](https://github.com/kud/webext-email-address-plus/commit/4f4f68d736a9c2757891c703add0ac7359829ef4))
+
+<details>
+<summary>Internal (1 commit)</summary>
+
+- Web preview gallery of the popup and options on invented fixture data, deployable to Vercel (`npm run preview`, `build:preview`) and excluded from the extension and sources zips.
+
+</details>
+
 ## [5.3.1] - 2026-06-28
 
 ### Changed
+
 - Version bump
 
 ## [5.3.0] - 2025-08-16
 
 ### Changed
+
 - Version bump
 
 ## [5.2.4] - 2025-08-16
 
 ### Changed
+
 - Version bump
 
 ## [5.2.3] - 2025-08-16
 
 ### Changed
+
 - Version bump
 
 ## [5.2.2] - 2025-08-16
 
 ### Changed
+
 - Updated Node.js engine requirement to version 22.0.0 for latest stable features
 - Increased icon stroke width from 1.1 to 1.3 for improved visibility and consistency
 
 ## [5.2.1] - 2025-08-10
 
 ### Changed
+
 - Version bump
 
 ## [5.1.1] - 2025-08-10
 
 ### Changed
+
 - Version bump
 
 ## [5.2.0] - 2025-08-10
