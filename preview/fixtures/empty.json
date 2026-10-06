@@ -1,0 +1,10 @@
+{
+  "tabUrl": "about:blank",
+  "storage": {
+    "email": "",
+    "domainMode": "main",
+    "showHistory": true,
+    "showFloatingIcon": true,
+    "emailHistory": []
+  }
+}

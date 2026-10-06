@@ -84,6 +84,26 @@ npm run build
 npm run lint
 ```
 
+## 🖼️ Web preview
+
+`preview/` is a permanent gallery of the real popup and options pages,
+running bundled against invented `example.*` fixture data through a fake
+`browser` API shim. It is excluded from the extension build and the AMO
+source zip.
+
+```bash
+# Interactive gallery with light/dark frames per fixture
+npm run preview
+
+# Static output in preview-dist/ (also what vercel.json deploys)
+npm run build:preview
+```
+
+Light/dark pinning rewrites the pages' own `prefers-color-scheme` rules, so
+the preview never carries a copy of their CSS. In the dev server the pages'
+component styles are JS-injected and follow the OS scheme instead; the static
+build pins every frame exactly.
+
 ## 🏪 Updating the AMO listing
 
 The public add-on page (name, summary, description, categories and screenshots) lives in this repo: `amo/listing.json` for the text, `amo/screenshots/` for the previews (name-sorted, with an optional same-named `.txt` as the caption). The repo is the source of truth, so anything edited by hand on the AMO dashboard gets overwritten on the next push.

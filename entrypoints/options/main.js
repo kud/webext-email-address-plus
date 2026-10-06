@@ -4,54 +4,52 @@ import "../../assets/theme.css"
 import "./index.css"
 import { settings } from "../../utils/settings"
 
+const SAMPLE_HOST = "www.shop.example.com"
+const PLACEHOLDER_EMAIL = "you@example.org"
+
 // Auto-save functionality
 let saveTimeout = null
 
 const showSaveIndicator = () => {
-  const saveStatus = document.querySelector("#save-status")
   const saveIndicator = document.querySelector(".save-indicator")
-
-  // The hidden attribute rather than an inline display style: the design
-  // system makes [hidden] authoritative with !important, so an inline
-  // display would lose to it and the indicator would never appear.
-  saveStatus.hidden = false
   saveIndicator.classList.add("show")
 
   setTimeout(() => {
     saveIndicator.classList.remove("show")
-    setTimeout(() => {
-      saveStatus.hidden = true
-    }, 300)
   }, 1500)
 }
 
+const selectedDomainMode = () =>
+  document.querySelector('input[name="domainMode"]:checked')?.value ?? "main"
+
 const autoSave = async () => {
   const emailInput = document.querySelector("#email")
-  const domainModeSelect = document.querySelector("#domainMode")
+  const emailError = document.querySelector("#email-error")
   const showHistoryCheckbox = document.querySelector("#showHistory")
   const showFloatingIconCheckbox = document.querySelector("#showFloatingIcon")
 
   const emailValue = emailInput.value.trim()
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-  // Clear previous invalid state
   emailInput.classList.remove("invalid")
+  emailInput.removeAttribute("aria-invalid")
+  emailError.hidden = true
 
-  // Only validate email if it's not empty
   if (emailValue && !emailRegex.test(emailValue)) {
     emailInput.classList.add("invalid")
-    return // Don't save invalid email
+    emailInput.setAttribute("aria-invalid", "true")
+    emailError.hidden = false
+    return
   }
 
   try {
     await settings.set({
       email: emailValue,
-      domainMode: domainModeSelect.value,
+      domainMode: selectedDomainMode(),
       showHistory: showHistoryCheckbox.checked,
       showFloatingIcon: showFloatingIconCheckbox.checked,
     })
 
-    // Show save indicator only if email is valid
     if (!emailValue || emailRegex.test(emailValue)) {
       showSaveIndicator()
     }
@@ -62,15 +60,11 @@ const autoSave = async () => {
 
 const debouncedAutoSave = () => {
   clearTimeout(saveTimeout)
-  saveTimeout = setTimeout(autoSave, 500) // Wait 500ms after last change
+  saveTimeout = setTimeout(autoSave, 500)
 }
 
 const restoreOptions = async () => {
   try {
-    // Falling back to the declared defaults rather than letting the catch below
-    // leave every control at its HTML state — which renders as "everything off"
-    // for two settings that default on, and looks like saved data rather than a
-    // failed read.
     const { email, domainMode, showHistory, showFloatingIcon } = await settings
       .get()
       .catch((error) => {
@@ -79,15 +73,17 @@ const restoreOptions = async () => {
       })
 
     const emailInput = document.querySelector("#email")
-    const domainModeSelect = document.querySelector("#domainMode")
     const showHistoryCheckbox = document.querySelector("#showHistory")
     const showFloatingIconCheckbox = document.querySelector("#showFloatingIcon")
 
     if (email && emailInput) {
       emailInput.value = email
     }
-    if (domainMode && domainModeSelect) {
-      domainModeSelect.value = domainMode
+    const modeRadio = document.querySelector(
+      `input[name="domainMode"][value="${domainMode}"]`,
+    )
+    if (modeRadio) {
+      modeRadio.checked = true
     }
     if (showHistoryCheckbox) {
       showHistoryCheckbox.checked = showHistory
@@ -96,8 +92,7 @@ const restoreOptions = async () => {
       showFloatingIconCheckbox.checked = showFloatingIcon
     }
 
-    // Update preview after restoring values
-    updatePreview()
+    updateExamples()
   } catch (error) {
     console.error("Failed to restore options:", error)
   }
@@ -113,7 +108,6 @@ const generateLabel = (hostname, domainMode) => {
   switch (domainMode) {
     case "main":
       if (hostnameArr.length >= 2) {
-        // Handle common ccTLD patterns like .co.uk, .com.au, etc.
         if (
           hostnameArr.length >= 3 &&
           (hostnameArr[hostnameArr.length - 2] === "co" ||
@@ -157,71 +151,58 @@ const generatePreviewEmail = (email, hostname, domainMode) => {
   return label ? `${preEmail}+${label}@${postEmail}` : email
 }
 
-const updatePreview = () => {
-  const emailInput = document.querySelector("#email")
-  const domainModeSelect = document.querySelector("#domainMode")
-  const previewGroup = document.querySelector("#preview-group")
-  const previewDiv = document.querySelector("#email-preview")
-
-  const email = emailInput.value.trim()
-  const domainMode = domainModeSelect.value
-
-  if (!email || !email.includes("@")) {
-    previewGroup.hidden = true
+const appendTaggedAddress = (parent, address) => {
+  const at = address.lastIndexOf("@")
+  const plus = address.indexOf("+")
+  if (plus < 0 || plus > at) {
+    parent.append(document.createTextNode(address))
     return
   }
+  parent.append(document.createTextNode(address.slice(0, plus)))
+  const mark = document.createElement("mark")
+  mark.className = "plus-tag"
+  mark.textContent = address.slice(plus, at)
+  parent.append(mark)
+  parent.append(document.createTextNode(address.slice(at)))
+}
 
-  // Sample websites for examples
-  const sampleSites = [
-    { hostname: "github.com", name: "GitHub" },
-    { hostname: "www.amazon.com", name: "Amazon" },
-    { hostname: "mail.google.com", name: "Gmail" },
-  ]
+// Each radio shows the address it would produce, so a first run with no
+// address yet previews on a muted placeholder instead of an em dash.
+const updateExamples = () => {
+  const emailInput = document.querySelector("#email")
+  const typed = emailInput.value.trim()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const email = emailRegex.test(typed) ? typed : PLACEHOLDER_EMAIL
 
-  previewDiv.innerHTML = ""
-  sampleSites.forEach((site) => {
-    const generatedEmail = generatePreviewEmail(
+  document.querySelectorAll(".choice-example").forEach((example) => {
+    const preview = generatePreviewEmail(
       email,
-      site.hostname,
-      domainMode,
+      SAMPLE_HOST,
+      example.dataset.mode,
     )
-
-    const previewItem = document.createElement("div")
-    previewItem.className = "preview-item"
-
-    const labelSpan = document.createElement("span")
-    labelSpan.className = "preview-label"
-    labelSpan.textContent = site.name + ":"
-
-    const emailSpan = document.createElement("span")
-    emailSpan.className = "preview-email"
-    emailSpan.textContent = generatedEmail
-
-    previewItem.appendChild(labelSpan)
-    previewItem.appendChild(emailSpan)
-
-    previewDiv.appendChild(previewItem)
+    example.textContent = ""
+    appendTaggedAddress(example, preview)
   })
-  previewGroup.hidden = false
 }
 
 document.addEventListener("DOMContentLoaded", restoreOptions)
 
-// Add event listeners for auto-save and preview
 document.querySelector("#email").addEventListener("input", () => {
   debouncedAutoSave()
-  updatePreview()
+  updateExamples()
 })
 
-document.querySelector("#domainMode").addEventListener("change", () => {
-  autoSave() // Immediate save for dropdown changes
-  updatePreview()
+document.querySelectorAll('input[name="domainMode"]').forEach((radio) => {
+  radio.addEventListener("change", () => {
+    autoSave()
+    updateExamples()
+  })
 })
 
 document.querySelector("#showHistory").addEventListener("change", () => {
-  autoSave() // Immediate save for checkbox changes
+  autoSave()
 })
 
 document.querySelector("#showFloatingIcon").addEventListener("change", () => {
-  autoSave() // Immediate save for checkbox changes
+  autoSave()
 })

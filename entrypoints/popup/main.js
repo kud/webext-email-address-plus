@@ -4,11 +4,60 @@ import "@kud/webext-ui/webext-ui.css"
 import "../../assets/theme.css"
 import "./tooltip.css"
 import { settings } from "../../utils/settings"
-;(async function () {
+
+const ICONS = {
+  check:
+    '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>',
+  copy: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="2"/><path d="M10.5 3.5v-.5a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5h.5"/></svg>',
+  alert:
+    '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M8 4.5v4.5"/><circle cx="8" cy="11.75" r=".5" fill="currentColor"/></svg>',
+}
+
+const setTitle = (tone, text) => {
   const title = document.getElementById("card-title")
+  title.textContent = ""
+  const icon = document.createElement("span")
+  icon.className = "title-icon"
+  icon.dataset.tone = tone
+  icon.innerHTML = tone === "success" ? ICONS.check : ICONS.alert
+  title.append(icon, document.createTextNode(text))
+}
+
+// alex+example.com@example.org renders with the label on a tint, because the
+// label is the point of the extension. Built with nodes so an address never
+// parses as markup.
+const appendTaggedAddress = (parent, address) => {
+  const at = address.lastIndexOf("@")
+  const plus = address.indexOf("+")
+  if (plus < 0 || plus > at) {
+    parent.append(document.createTextNode(address))
+    return
+  }
+  parent.append(document.createTextNode(address.slice(0, plus)))
+  const mark = document.createElement("mark")
+  mark.className = "plus-tag"
+  mark.textContent = address.slice(plus, at)
+  parent.append(mark)
+  parent.append(document.createTextNode(address.slice(at)))
+}
+
+const copyText = async (text) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+  const textArea = document.createElement("textarea")
+  textArea.value = text
+  document.body.appendChild(textArea)
+  textArea.select()
+  document.execCommand("copy")
+  document.body.removeChild(textArea)
+}
+
+;(async function () {
   const subtitle = document.getElementById("card-subtitle")
 
-  if (!title || !subtitle) {
+  if (!subtitle) {
     console.error("Required DOM elements not found")
     return
   }
@@ -18,12 +67,10 @@ import { settings } from "../../utils/settings"
   let hostname = ""
 
   try {
-    // Get email and domainMode from storage
     const prefs = await settings.get()
     email = prefs.email.trim()
     domainMode = prefs.domainMode
 
-    // Get the current tab's hostname
     const tabs = await invoke(api.tabs, "query", {
       active: true,
       currentWindow: true,
@@ -32,8 +79,6 @@ import { settings } from "../../utils/settings"
       try {
         const url = new URL(tabs[0].url)
         hostname = url.hostname
-
-        // Skip special protocols
         if (
           url.protocol === "chrome:" ||
           url.protocol === "about:" ||
@@ -51,23 +96,21 @@ import { settings } from "../../utils/settings"
     console.error("Failed to get storage or tab data:", e)
     email = ""
   }
-  // Email validation function
-  const isValidEmail = (email) => {
+
+  const isValidEmail = (value) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email) && email.includes("@")
+    return emailRegex.test(value) && value.includes("@")
   }
 
-  // Improved domain parsing function
-  const generateLabel = (hostname, domainMode) => {
-    if (!hostname) return ""
+  const generateLabel = (host, mode) => {
+    if (!host) return ""
 
-    const hostnameArr = hostname.split(".")
-    let label = hostname
+    const hostnameArr = host.split(".")
+    let label = host
 
-    switch (domainMode) {
+    switch (mode) {
       case "main":
         if (hostnameArr.length >= 2) {
-          // Handle common ccTLD patterns like .co.uk, .com.au, etc.
           if (
             hostnameArr.length >= 3 &&
             (hostnameArr[hostnameArr.length - 2] === "co" ||
@@ -91,32 +134,23 @@ import { settings } from "../../utils/settings"
         break
       case "full":
       default:
-        label = hostname
+        label = host
         break
     }
 
-    // Sanitize label for email use
     return label.replace(/[^a-zA-Z0-9.-]/g, "").toLowerCase()
   }
 
-  // Email history management
   const MAX_HISTORY_ITEMS = 3
 
   const saveEmailToHistory = async (emailAddress) => {
     try {
       let history = (await settings.get()).emailHistory
-
-      // Remove if already exists (move to front)
       history = history.filter((item) => item !== emailAddress)
-
-      // Add to front
       history.unshift(emailAddress)
-
-      // Keep only MAX_HISTORY_ITEMS
       if (history.length > MAX_HISTORY_ITEMS) {
         history = history.slice(0, MAX_HISTORY_ITEMS)
       }
-
       await settings.set({ emailHistory: history })
     } catch (error) {
       console.error("Failed to save email to history:", error)
@@ -135,45 +169,39 @@ import { settings } from "../../utils/settings"
         return
       }
 
-      historyList.innerHTML = ""
+      historyList.textContent = ""
 
-      history.forEach((email) => {
-        const item = document.createElement("div")
-        item.className = "row"
+      history.forEach((address) => {
+        const item = document.createElement("button")
+        item.type = "button"
+        item.className = "row-bleed history-item"
+        item.setAttribute("aria-label", `Copy ${address}`)
+        item.dataset.address = address
 
         const emailSpan = document.createElement("span")
         emailSpan.className = "history-email"
-        emailSpan.textContent = email
+        appendTaggedAddress(emailSpan, address)
 
-        const copyBtn = document.createElement("button")
-        copyBtn.className = "btn"
-        const btnLabel = document.createElement("span")
-        btnLabel.setAttribute("aria-live", "polite")
-        btnLabel.textContent = "Copy"
-        copyBtn.appendChild(btnLabel)
-        copyBtn.addEventListener("click", async () => {
+        const action = document.createElement("span")
+        action.className = "history-action"
+        action.setAttribute("aria-live", "polite")
+        action.innerHTML = ICONS.copy
+
+        item.append(emailSpan, action)
+        item.addEventListener("click", async () => {
           try {
-            if (navigator.clipboard && window.isSecureContext) {
-              await navigator.clipboard.writeText(email)
-            } else {
-              const textArea = document.createElement("textarea")
-              textArea.value = email
-              document.body.appendChild(textArea)
-              textArea.select()
-              document.execCommand("copy")
-              document.body.removeChild(textArea)
-            }
-            btnLabel.textContent = "Copied"
+            await copyText(item.dataset.address)
+            item.classList.add("is-copied")
+            action.innerHTML = `${ICONS.check}<span>Copied</span>`
             setTimeout(() => {
-              btnLabel.textContent = "Copy"
+              item.classList.remove("is-copied")
+              action.innerHTML = ICONS.copy
             }, 1000)
           } catch (e) {
             console.error("Failed to copy from history:", e)
           }
         })
 
-        item.appendChild(emailSpan)
-        item.appendChild(copyBtn)
         historyList.appendChild(item)
       })
 
@@ -183,34 +211,38 @@ import { settings } from "../../utils/settings"
     }
   }
 
-  // Success animation function
   const showSuccessAnimation = (labeledEmail) => {
-    const title = document.getElementById("card-title")
-    const subtitle = document.getElementById("card-subtitle")
-
-    // Save to history
     saveEmailToHistory(labeledEmail)
 
-    // Wait a bit for tooltip to display before starting animation
     setTimeout(() => {
-      title.innerHTML =
-        '<span class="success-checkmark">✅</span>Email address copied'
-      subtitle.textContent = `${labeledEmail} • Ready to paste`
+      setTitle("success", "Email address copied")
+      subtitle.className = "address"
+      subtitle.textContent = ""
+      appendTaggedAddress(subtitle, labeledEmail)
     }, 200)
   }
 
+  const showError = (heading, withSettingsButton) => {
+    setTitle("danger", heading)
+    subtitle.className = "status"
+    subtitle.textContent = "Set it in Settings, then open the popup again."
+    if (withSettingsButton) {
+      const openSettings = document.createElement("button")
+      openSettings.type = "button"
+      openSettings.className = "btn btn-primary btn-block"
+      openSettings.textContent = "Open settings"
+      openSettings.addEventListener("click", () => {
+        api.runtime.openOptionsPage()
+      })
+      subtitle.after(openSettings)
+    }
+  }
+
   if (!email) {
-    title.textContent = "❌ Email address missing"
-    subtitle.textContent =
-      "Please set your email address in the extension preferences."
-    subtitle.classList.add("error")
+    showError("Email address missing", true)
   } else if (!isValidEmail(email)) {
-    title.textContent = "❌ Invalid email format"
-    subtitle.textContent =
-      "Please check your email address in the extension preferences."
-    subtitle.classList.add("error")
+    showError("Invalid email format", true)
   } else {
-    // Generate labeled email
     let labeledEmail = email
     if (hostname) {
       const atIndex = email.lastIndexOf("@")
@@ -218,37 +250,24 @@ import { settings } from "../../utils/settings"
         const preEmail = email.substring(0, atIndex)
         const postEmail = email.substring(atIndex + 1)
         const label = generateLabel(hostname, domainMode)
-
         if (label) {
           labeledEmail = `${preEmail}+${label}@${postEmail}`
         }
       }
     }
 
-    // Copy to clipboard with better error handling
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(labeledEmail)
-        showSuccessAnimation(labeledEmail)
-      } else {
-        // Fallback for non-secure contexts
-        const textArea = document.createElement("textarea")
-        textArea.value = labeledEmail
-        document.body.appendChild(textArea)
-        textArea.select()
-        document.execCommand("copy")
-        document.body.removeChild(textArea)
-        showSuccessAnimation(labeledEmail)
-      }
-      subtitle.classList.remove("error")
+      await copyText(labeledEmail)
+      showSuccessAnimation(labeledEmail)
     } catch (e) {
       console.error("Failed to copy to clipboard:", e)
-      title.textContent = "⚠️ Copy failed"
-      subtitle.textContent = `Email: ${labeledEmail}`
-      subtitle.classList.add("error")
+      setTitle("danger", "Copy failed")
+      subtitle.className = "status"
+      subtitle.textContent = ""
+      appendTaggedAddress(subtitle, labeledEmail)
     }
   }
-  // Settings button functionality
+
   const settingsBtn = document.getElementById("settings-btn")
   if (settingsBtn) {
     settingsBtn.addEventListener("click", () => {
@@ -256,9 +275,51 @@ import { settings } from "../../utils/settings"
     })
   }
 
-  // Render email history
   renderEmailHistory()
 
-  // Auto-close after 4s
-  setTimeout(() => window.close(), 4000)
+  // Auto-close after 4s, paused while the pointer or focus is inside the
+  // popup so a Recent row stays reachable. The bar mirrors the timer: its
+  // animation pauses on hover/focus in CSS and restarts here with whatever
+  // time is left.
+  const AUTO_CLOSE_MS = 4000
+  const bar = document.querySelector(".autoclose span")
+  let closeTimer = null
+  let closeStartedAt = 0
+  let remaining = AUTO_CLOSE_MS
+
+  const scheduleClose = (ms) => {
+    clearTimeout(closeTimer)
+    closeStartedAt = Date.now()
+    remaining = ms
+    if (bar) {
+      bar.style.animation = "none"
+      void bar.offsetWidth
+      bar.style.animation = ""
+      bar.style.animationDuration = `${ms}ms`
+    }
+    closeTimer = setTimeout(() => window.close(), ms)
+  }
+
+  const pauseClose = () => {
+    if (!closeTimer) return
+    clearTimeout(closeTimer)
+    closeTimer = null
+    remaining -= Date.now() - closeStartedAt
+    if (bar) bar.style.animationPlayState = "paused"
+  }
+
+  const resumeClose = () => {
+    if (closeTimer) return
+    scheduleClose(Math.max(remaining, 0))
+  }
+
+  document.body.addEventListener("mouseenter", pauseClose)
+  document.body.addEventListener("mouseleave", resumeClose)
+  document.addEventListener("focusin", pauseClose)
+  document.addEventListener("focusout", (event) => {
+    if (!event.relatedTarget || !document.contains(event.relatedTarget)) {
+      resumeClose()
+    }
+  })
+  scheduleClose(AUTO_CLOSE_MS)
 })()

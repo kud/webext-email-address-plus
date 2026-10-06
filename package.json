@@ -19,6 +19,8 @@
     "zip": "wxt zip -b firefox",
     "postinstall": "wxt prepare",
     "lint": "web-ext lint --source-dir .output/firefox-mv2 --no-config-discovery",
+    "preview": "vite --config preview/vite.config.js",
+    "build:preview": "vite build --config preview/vite.config.js",
     "publish": "node -e \"const fs=require('fs'); const changelog=fs.readFileSync('CHANGELOG.md','utf8'); const sections=changelog.split(/## \\[/); const firstSection=sections[1]; const match=firstSection?firstSection.split(/\\n(?=## )/)[0]:''; const lines=match.split('\\n').slice(1); const notes=lines.join('\\n').trim(); fs.writeFileSync('.amo-metadata.json', JSON.stringify({release_notes:{en:notes}}, null, 2));\" && web-ext sign --channel=listed --amo-metadata=.amo-metadata.json --source-dir .output/firefox-mv2 --upload-source-code .output/${npm_package_name}-${npm_package_version}-sources.zip",
     "version": "node -e \"const pkg=require('./package.json'); const fs=require('fs'); const changelog=fs.readFileSync('CHANGELOG.md','utf8'); const today=new Date().toISOString().split('T')[0]; const newEntry='## ['+pkg.version+'] - '+today+'\\n\\n### Changed\\n- Version bump\\n\\n'; const headerMatch=changelog.match(/(# Changelog[\\s\\S]*?\\n\\n)(?=## \\[)/); if(headerMatch) { const header=headerMatch[1]; const rest=changelog.substring(headerMatch.index + headerMatch[1].length); const updated=header+newEntry+rest; fs.writeFileSync('CHANGELOG.md', updated); } else { console.error('Could not find changelog header'); } console.log('Updated CHANGELOG.md to version', pkg.version);\" && git add CHANGELOG.md",
     "format": "prettier --write \"**/*.{js,json,html,css,md,ts}\"",

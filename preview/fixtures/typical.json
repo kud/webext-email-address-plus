@@ -1,0 +1,13 @@
+{
+  "tabUrl": "https://shop.example.com/checkout",
+  "storage": {
+    "email": "alex@example.org",
+    "domainMode": "main",
+    "showHistory": true,
+    "showFloatingIcon": true,
+    "emailHistory": [
+      "alex+example.net@example.org",
+      "alex+example.co.uk@example.org"
+    ]
+  }
+}

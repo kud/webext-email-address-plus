@@ -1,24 +1,20 @@
 /* Email Address Plus — options page identity.
  *
  * Everything shared comes from the @kud/webext-ui npm package, imported by
- * main.js ahead of this file.
- *
- * Scope note: the popup (entrypoints/popup) now also uses the system. tooltip.css
- * holds only its local remainder (status error colour, history email style,
- * success-checkmark animation).
+ * main.js ahead of this file. The .plus-tag rule lives in assets/theme.css
+ * because the popup uses it too.
  */
+
+/* To be upstreamed to @kud/webext-ui: a label 4px from its field is cramped
+ * fleet-wide, and a muted label reads as secondary where the page has no
+ * other hierarchy. */
+.field {
+  gap: var(--space-2);
+  color: var(--fg);
+}
 
 :root {
   --page-width: 420px;
-}
-
-.required {
-  color: var(--danger);
-}
-
-.example {
-  color: var(--muted);
-  font-style: italic;
 }
 
 /* JS toggles .invalid after its own check; the system's :user-invalid covers
@@ -27,57 +23,124 @@ input[type="email"].invalid {
   border-color: var(--danger);
 }
 
-.email-preview {
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.settings-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.settings-head .save-status.hint {
+  margin: 0;
+  min-height: 0;
+}
+
+.settings-heading {
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.settings-head .settings-heading {
+  margin: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.choice-list {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.choice-list > * {
+  border-top: 0 !important;
+}
+
+.choice + .choice {
+  border-top: 1px solid var(--border) !important;
+}
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  cursor: pointer;
+}
+
+.choice input {
+  width: auto;
+  min-height: 0;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+
+.choice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.choice-example {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  background: var(--hover);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-  word-break: break-all;
-  line-height: var(--line-base);
-}
-
-.preview-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.preview-item + .preview-item {
-  margin-top: var(--space-2);
-}
-
-.preview-label {
   color: var(--muted);
-  min-width: 80px;
+  overflow-wrap: anywhere;
 }
 
-.preview-email {
-  font-weight: 600;
+.choice-list .field-note {
+  margin-top: var(--space-1);
 }
 
-.save-status {
+.field-group {
   display: flex;
-  justify-content: center;
-  margin-top: var(--space-4);
+  flex-direction: column;
+  gap: 0;
+}
+
+.toggle-list .row {
+  padding: var(--space-3) 0;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+/* The line is always there, so nothing shifts when "Saved" fades in beside
+   the first heading. */
+.save-status.hint {
+  justify-content: flex-start;
+  min-height: 20px;
 }
 
 .save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
   opacity: 0;
-  transform: translateY(-10px);
-  transition:
-    opacity var(--dur-slow) var(--ease),
-    transform var(--dur-slow) var(--ease);
+  transition: opacity var(--dur-slow) var(--ease);
 }
 
 .save-indicator.show {
   opacity: 1;
-  transform: translateY(0);
 }
 
-.spoiler {
-  color: var(--muted);
-  text-align: center;
-  font-style: italic;
+.save-indicator svg {
+  color: var(--success);
 }

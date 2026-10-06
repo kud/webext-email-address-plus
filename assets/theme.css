@@ -16,3 +16,13 @@
     --accent-fg: #1c1b22; /* 5.31:1 on --accent */
   }
 }
+
+/* The generated +label, tinted because the label is the point of the
+ * extension. Shared by the popup hero, its Recent rows and the options page
+ * radio examples. */
+.plus-tag {
+  padding: 0 2px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg));
+  color: var(--fg);
+}

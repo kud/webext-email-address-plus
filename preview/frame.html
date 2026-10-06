@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Email Address Plus preview frame</title>
+  </head>
+  <body>
+    <script>
+      // Loads the extension's REAL page (entrypoints/<page>/index.html and its
+      // bundled main.js) with the browser shim in front of it.
+      //   ?page=popup|options
+      //   ?fixture=<name>    data, see fixtures/*.json
+      //   ?scheme=light|dark pins the colour scheme by rewriting the page's
+      //                      own prefers-color-scheme rules, so the preview
+      //                      never carries a copy of its CSS
+      const params = new URLSearchParams(location.search)
+      const page = params.get("page") === "options" ? "options" : "popup"
+      const scheme = params.get("scheme") === "dark" ? "dark" : "light"
+      const frameDir = new URL("./", location.href)
+      const pageDir = new URL(`../entrypoints/${page}/`, location.href)
+
+      const pinScheme = (css) =>
+        css
+          .replace(
+            /\(prefers-color-scheme:\s*dark\)/g,
+            scheme === "dark" ? "(min-width: 0px)" : "(min-width: 99999px)",
+          )
+          .replace(/color-scheme:\s*light dark/g, `color-scheme: ${scheme}`)
+
+      const load = async () => {
+        const pageUrl = new URL("index.html", pageDir)
+        let html = await (await fetch(pageUrl)).text()
+        const links = [
+          ...html.matchAll(
+            /<link[^>]+rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g,
+          ),
+        ]
+        for (const [tag, href] of links) {
+          const css = await (await fetch(new URL(href, pageUrl))).text()
+          html = html.replace(tag, `<style>${pinScheme(css)}</style>`)
+        }
+        html = html.replace(
+          /<style>([\s\S]*?)<\/style>/g,
+          (match, css) => `<style>${pinScheme(css)}</style>`,
+        )
+        const injected =
+          `<head><base href="${pageDir.href}" />` +
+          `<meta name="color-scheme" content="${scheme}" />` +
+          `<script src="${new URL("browser-shim.js", frameDir).href}"><\/script>`
+        document.open()
+        document.write(html.replace("<head>", injected))
+        document.close()
+      }
+
+      load()
+    </script>
+  </body>
+</html>

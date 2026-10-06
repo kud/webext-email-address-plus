@@ -9,47 +9,91 @@
   </head>
 
   <body class="page">
-    <div class="card stack">
-      <label class="field">
-        <span>Email address <span class="required">*</span></span>
-        <input type="email" id="email" required />
-      </label>
-
-      <label class="field">
-        <span>Domain label mode</span>
-        <select id="domainMode">
-          <option value="main">Main domain (example.com)</option>
-          <option value="short">Short (example)</option>
-          <option value="full">Full domain (www.example.com)</option>
-        </select>
-      </label>
-
-      <div class="field" id="preview-group" hidden>
-        <span>Preview</span>
-        <div id="email-preview" class="email-preview"></div>
+    <div class="settings">
+      <div class="settings-head">
+        <h2 class="settings-heading">Your address</h2>
+        <div id="save-status" class="save-status hint" role="status">
+          <span class="save-indicator">
+            <svg
+              aria-hidden="true"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3.5 8.5l3 3 6-7" />
+            </svg>
+            Saved
+          </span>
+        </div>
       </div>
 
-      <label class="field-inline">
-        <input type="checkbox" id="showHistory" class="checkbox-input" />
-        Show recent emails history in popup
+      <label class="field">
+        <span class="visually-hidden">Email address</span>
+        <input
+          type="email"
+          id="email"
+          required
+          aria-describedby="email-note email-error"
+        />
       </label>
+      <span class="field-note" id="email-note">
+        Saved on this computer only.
+      </span>
+      <span class="field-error" id="email-error" hidden>
+        Enter a full address, like alex@example.org.
+      </span>
 
-      <label class="field-inline">
-        <input type="checkbox" id="showFloatingIcon" class="checkbox-input" />
-        Show floating icon on input fields
-      </label>
+      <fieldset class="choice-list rows-divided">
+        <legend class="settings-heading">Label to add</legend>
+        <label class="choice">
+          <input type="radio" name="domainMode" value="main" />
+          <span class="choice-text">
+            <span>Main domain</span>
+            <span class="choice-example" data-mode="main"></span>
+          </span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="domainMode" value="short" />
+          <span class="choice-text">
+            <span>Short</span>
+            <span class="choice-example" data-mode="short"></span>
+          </span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="domainMode" value="full" />
+          <span class="choice-text">
+            <span>Full domain</span>
+            <span class="choice-example" data-mode="full"></span>
+          </span>
+        </label>
+        <p class="field-note">Shown for a page on www.shop.example.com.</p>
+      </fieldset>
 
-      <div role="status">
-        <div id="save-status" class="save-status" hidden>
-          <span class="save-indicator badge badge-success">Saved</span>
+      <div class="field-group">
+        <h2 class="settings-heading">Popup and page</h2>
+        <div class="rows-divided toggle-list">
+          <label class="row">
+            <span>Recent addresses in the popup</span>
+            <span class="switch">
+              <input type="checkbox" id="showHistory" />
+              <span class="track"><span class="thumb"></span></span>
+            </span>
+          </label>
+          <label class="row">
+            <span>Icon inside email fields</span>
+            <span class="switch">
+              <input type="checkbox" id="showFloatingIcon" />
+              <span class="track"><span class="thumb"></span></span>
+            </span>
+          </label>
         </div>
       </div>
     </div>
-
-    <p class="spoiler">
-      <span class="required">*</span> The email address is only saved on this
-      computer.
-    </p>
 
     <script type="module" src="./main.js"></script>
   </body>

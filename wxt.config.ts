@@ -58,6 +58,6 @@ export default defineConfig({
     },
   }),
   zip: {
-    excludeSources: ["web-ext-artifacts/**"],
+    excludeSources: ["web-ext-artifacts/**", "preview/**", "preview-dist/**"],
   },
 })

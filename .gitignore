@@ -6,3 +6,4 @@ web-ext-artifacts/
 .amo-upload-uuid
 .output/
 .wxt/
+preview-dist/

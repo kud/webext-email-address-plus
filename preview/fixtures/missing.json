@@ -1,0 +1,10 @@
+{
+  "tabUrl": "https://shop.example.com/checkout",
+  "storage": {
+    "email": "",
+    "domainMode": "main",
+    "showHistory": true,
+    "showFloatingIcon": true,
+    "emailHistory": []
+  }
+}
