@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "previews": [
+    {
+      "id": 330881,
+      "file": "0-settings.png",
+      "sha256": "041f187eac27ae48edaf90bc07d8b940dea1fbd30f2d5ed206b9a1f33b50b9a4",
+      "caption": "Settings"
+    },
+    {
+      "id": 330882,
+      "file": "1-fill.png",
+      "sha256": "e6c5a8857a6c500ec6a02f2684e1ea853fa264a82bf59406b11130cac77c36ab",
+      "caption": "Fill the input with a labeled email address"
+    },
+    {
+      "id": 330883,
+      "file": "2-result.png",
+      "sha256": "b16a8a58c6c38d2cabc94d3a74eb497992125c246e6a7e76c38917e1e3ad4728",
+      "caption": "Result"
+    }
+  ]
+}
