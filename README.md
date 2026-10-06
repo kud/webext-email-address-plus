@@ -84,25 +84,25 @@ npm run build
 npm run lint
 ```
 
-## 🖼️ Web preview
+## 🖼️ Web demo
 
-`preview/` is a permanent gallery of the real popup and options pages,
-running bundled against invented `example.*` fixture data through a fake
-`browser` API shim. It is excluded from the extension build and the AMO
-source zip.
+`preview/` is the live demo: the real popup and options pages, exactly as they
+ship, side by side on one realistic set of invented `example.*` data, running
+against a fake `browser` API shim. Generating an address, the Recent list and
+the settings all work; changes live in the tab's session storage and vanish when
+it closes. The popup stays open instead of closing after four seconds, and its
+timer bar is hidden for that reason. It is excluded from the extension build and
+the AMO source zip, and `vercel.json` deploys it.
 
 ```bash
-# Interactive gallery with light/dark frames per fixture
+# Run the demo locally
 npm run preview
 
 # Static output in preview-dist/ (also what vercel.json deploys)
 npm run build:preview
 ```
 
-Light/dark pinning rewrites the pages' own `prefers-color-scheme` rules, so
-the preview never carries a copy of their CSS. In the dev server the pages'
-component styles are JS-injected and follow the OS scheme instead; the static
-build pins every frame exactly.
+The colour scheme follows the OS. `preview/fixtures/demo.json` holds the data.
 
 ## 🏪 Updating the AMO listing
 

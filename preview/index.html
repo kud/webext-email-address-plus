@@ -4,13 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>Email Address Plus preview</title>
+    <title>Email Address Plus demo</title>
     <style>
       :root {
         --page-bg: #f3f3f5;
         --page-fg: #1b1b1f;
         --page-muted: #62626b;
         --page-line: #d6d6dc;
+        --page-link: #0b5fd6;
         color-scheme: light dark;
       }
       @media (prefers-color-scheme: dark) {
@@ -19,6 +20,7 @@
           --page-fg: #ececf0;
           --page-muted: #9a9aa5;
           --page-line: #34343b;
+          --page-link: #7fb0ff;
         }
       }
       body {
@@ -31,89 +33,137 @@
           sans-serif;
       }
       main {
-        max-width: 1000px;
+        max-width: 960px;
         margin: 0 auto;
       }
       h1 {
         margin: 0 0 4px;
         font-size: 22px;
       }
-      h2 {
-        margin: 40px 0 12px;
-        font-size: 16px;
-      }
       p {
         margin: 0;
         color: var(--page-muted);
       }
-      .pair {
+      a {
+        color: var(--page-link);
+      }
+      .stage {
         display: flex;
         flex-wrap: wrap;
-        gap: 24px;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 32px;
+        margin-top: 32px;
       }
       figure {
         margin: 0;
+        max-width: 100%;
       }
       figcaption {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
         margin-bottom: 8px;
         font-size: 12px;
         color: var(--page-muted);
       }
+      figcaption select,
+      figcaption button {
+        font: inherit;
+        color: var(--page-fg);
+        background: transparent;
+        border: 1px solid var(--page-line);
+        border-radius: 6px;
+        padding: 2px 8px;
+      }
       iframe {
         display: block;
+        max-width: 100%;
         border: 1px solid var(--page-line);
         border-radius: 8px;
-        background: #fff;
-      }
-      iframe.popup {
-        width: 360px;
-        height: 600px;
-      }
-      iframe.options {
-        width: 480px;
-        height: 800px;
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>Email Address Plus preview</h1>
+      <h1>Email Address Plus</h1>
       <p>
-        The real popup and options pages, running on fixture data. Clicks and
-        edits change state in memory only; writes are logged to each frame's
-        console.
+        Labelled email addresses for every site, in your own inbox. The real
+        popup and settings page, running on invented data.
+        <a href="https://addons.mozilla.org/firefox/addon/email-address-plus/"
+          >Get it on Mozilla Add-ons</a
+        >.
       </p>
-      <div id="gallery"></div>
+      <div class="stage">
+        <figure>
+          <figcaption>
+            <span>Popup on</span>
+            <select id="site" aria-label="Site the popup opens on"></select>
+            <button type="button" id="reopen">Open again</button>
+            <span>(it stays open here instead of closing after 4s)</span>
+          </figcaption>
+          <iframe
+            id="popup"
+            title="Email Address Plus popup"
+            allow="clipboard-write"
+          ></iframe>
+        </figure>
+        <figure>
+          <figcaption>Settings, saved as you type</figcaption>
+          <iframe id="options" title="Email Address Plus settings"></iframe>
+        </figure>
+      </div>
     </main>
     <script>
-      const sections = [
-        [
-          "popup",
-          "typical",
-          "Popup, typical: labelled address copied, recent rows",
-        ],
-        ["popup", "long", "Popup, long: full-domain label on a long address"],
-        ["popup", "missing", "Popup, missing: no address set yet"],
-        ["options", "typical", "Options, typical: address set"],
-        ["options", "missing", "Options, first run: placeholder examples"],
-        ["options", "invalid", "Options, invalid: error line under the field"],
-      ]
-      const gallery = document.getElementById("gallery")
-      for (const [page, fixture, label] of sections) {
-        const section = document.createElement("section")
-        section.innerHTML = `<h2>${label}</h2><div class="pair"></div>`
-        for (const scheme of ["light", "dark"]) {
-          const figure = document.createElement("figure")
-          figure.innerHTML = `<figcaption>${fixture} / ${scheme}</figcaption>`
-          const frame = document.createElement("iframe")
-          frame.className = page
-          frame.src = `frame.html?page=${page}&fixture=${fixture}&scheme=${scheme}`
-          frame.title = `${page} ${fixture} fixture, ${scheme}`
-          figure.append(frame)
-          section.querySelector(".pair").append(figure)
-        }
-        gallery.append(section)
+      const popup = document.getElementById("popup")
+      const options = document.getElementById("options")
+      const site = document.getElementById("site")
+
+      // Frames are sized to their page, like the browser sizes the real popup.
+      const fit = (frame) => {
+        const doc = frame.contentDocument
+        if (!doc?.documentElement) return
+        const root = doc.documentElement
+        frame.style.width = `${Math.max(root.scrollWidth, 320)}px`
+        frame.style.height = `${root.scrollHeight}px`
       }
+      for (const frame of [popup, options]) {
+        frame.addEventListener("load", () => {
+          fit(frame)
+          new ResizeObserver(() => fit(frame)).observe(
+            frame.contentDocument.documentElement,
+          )
+        })
+      }
+
+      const openPopup = () => {
+        popup.src = `frame.html?page=popup&site=${encodeURIComponent(site.value)}`
+      }
+
+      options.src = "frame.html?page=options"
+      fetch("fixtures/demo.json")
+        .then((response) => response.json())
+        .then(({ sites }) => {
+          for (const url of sites) {
+            const option = document.createElement("option")
+            option.value = url
+            option.textContent = new URL(url).hostname
+            site.append(option)
+          }
+          openPopup()
+        })
+
+      site.addEventListener("change", openPopup)
+      document.getElementById("reopen").addEventListener("click", openPopup)
+
+      // The popup's Settings button: the settings page is already on screen.
+      window.addEventListener("message", (event) => {
+        if (event.data?.demo === "openOptionsPage") {
+          options.scrollIntoView({ behavior: "smooth", block: "nearest" })
+          options.contentWindow?.focus()
+        }
+      })
     </script>
   </body>
 </html>

@@ -27,7 +27,7 @@ const previewStatics = () => ({
   },
 })
 
-// Builds the permanent web preview: the gallery plus the real popup and
+// Builds the permanent web demo: the page that frames the real popup and
 // options entrypoints, bundled. Uses the project's own vite (via wxt), no
 // extra dependencies. preview/ stays out of the extension build and zip.
 export default defineConfig({
@@ -40,7 +40,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        gallery: join(root, "preview/index.html"),
+        demo: join(root, "preview/index.html"),
         frame: join(root, "preview/frame.html"),
         popup: join(root, "entrypoints/popup/index.html"),
         options: join(root, "entrypoints/options/index.html"),

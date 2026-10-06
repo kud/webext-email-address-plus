@@ -1,5 +1,10 @@
 {
-  "tabUrl": "https://shop.example.com/checkout",
+  "sites": [
+    "https://shop.example.com/checkout",
+    "https://www.news.example.co.uk/subscribe",
+    "https://accounts.example.net/signup",
+    "https://forum.example.org/register"
+  ],
   "storage": {
     "email": "alex@example.org",
     "domainMode": "main",
