@@ -6,7 +6,7 @@
     "en-US": "Automatically generate labeled email addresses for better organisation and spam protection."
   },
   "support_url": {
-    "en-US": "https://github.com/kud/webextension-email-address-plus/issues"
+    "en-US": "https://github.com/kud/webext-email-address-plus/issues"
   },
   "description": {
     "en-US": "Email Address Plus automatically adds website-specific labels to your email address when filling forms, making it easy to track where emails come from and organise your inbox.\n\n**Key Features:**\n• **Smart Email Labeling**: Automatically adds \"+website\" labels to your email (e.g., user+amazon@example.com)\n• **Multiple Fill Methods**: Floating icon, right-click context menu, or keyboard shortcut (Ctrl+Shift+Y)\n• **Visual Feedback**: Elegant animations confirm when fields are filled\n• **Dark/Light Theme Support**: Works seamlessly across all browser themes\n• **Privacy Focused**: All processing happens locally - no data sent to external servers\n• **Easy Setup**: Simple one-time configuration in extension settings\n\n**How it works:**\n1. Configure your email address in the extension settings\n2. Visit any website with email input fields\n3. Use the floating 📧 icon, right-click menu, or keyboard shortcut to auto-fill\n4. Your email gets automatically labeled with the website name\n\nPerfect for organising newsletters, shopping accounts, and identifying spam sources. Compatible with all major email providers that support plus-addressing (Gmail, Outlook, etc.)."
