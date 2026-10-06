@@ -1,0 +1,22 @@
+name: AMO listing
+
+on:
+  push:
+    branches: [main]
+    paths: ["amo/**"]
+  workflow_dispatch:
+    inputs:
+      apply: { type: boolean, default: false }
+      force: { type: boolean, default: false }
+
+permissions:
+  contents: write
+
+jobs:
+  listing:
+    uses: kud/webext/.github/workflows/amo-listing.yml@main
+    with:
+      apply: ${{ inputs.apply == true }}
+      force: ${{ inputs.force == true }}
+      guid: email-address-plus@kud.io
+    secrets: inherit
