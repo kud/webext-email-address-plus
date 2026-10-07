@@ -18,17 +18,13 @@ export default defineConfig({
         },
       },
     },
-    permissions: [
-      "activeTab",
-      "storage",
-      "clipboardWrite",
-      "theme",
-      "contextMenus",
-    ],
+    permissions: ["activeTab", "storage", "clipboardWrite", "contextMenus"],
     icons: {
       16: "icons/icon-16.png",
       32: "icons/icon-32.png",
       48: "icons/icon-48.png",
+      64: "icons/icon-64.png",
+      96: "icons/icon-96.png",
       128: "icons/icon-128.png",
     },
     commands: {
@@ -48,6 +44,14 @@ export default defineConfig({
       manifest.browser_action = {
         ...manifest.browser_action,
         default_title: "__MSG_extensionAction__",
+        default_icon: {
+          16: "icons/icon.svg",
+          32: "icons/icon.svg",
+        },
+        theme_icons: [
+          { dark: "icons/icon.svg", light: "icons/icon-dark.svg", size: 16 },
+          { dark: "icons/icon.svg", light: "icons/icon-dark.svg", size: 32 },
+        ],
       }
     },
   },
