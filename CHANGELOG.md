@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.0] - 2026-10-07
+
+### Added
+
+- A new identity: an envelope with a "+" mark, in the popup's blues with a teal plus, and a matching logo. ([3f711cd](https://github.com/kud/webext-email-address-plus/commit/3f711cddc939fcb69692d1a74c95197c396dc779))
+- New add-on icons at every size Firefox uses (16 to 128), with a separate drawing for the tiny toolbar size so the plus stays readable. ([3f711cd](https://github.com/kud/webext-email-address-plus/commit/3f711cddc939fcb69692d1a74c95197c396dc779))
+
+### Changed
+
+- The toolbar icon now follows the Firefox theme (light or dark) natively, so the extension no longer asks for the "theme" permission. ([3f711cd](https://github.com/kud/webext-email-address-plus/commit/3f711cddc939fcb69692d1a74c95197c396dc779))
+
 ## [5.4.1] - 2026-10-07
 
 ### Changed
