@@ -277,49 +277,90 @@ const copyText = async (text) => {
 
   renderEmailHistory()
 
-  // Auto-close after 4s, paused while the pointer or focus is inside the
-  // popup so a Recent row stays reachable. The bar mirrors the timer: its
-  // animation pauses on hover/focus in CSS and restarts here with whatever
-  // time is left.
+  // Auto-close after 4s, paused while the pointer or keyboard focus is inside
+  // the popup so a Recent row stays reachable. Focus counts only when it is
+  // :focus-visible, so a mouse click does not hold the popup open. This timer
+  // is the single source of truth and drives the drain bar itself; resuming
+  // needs both flags clear, and a window blur clears the focus one, since
+  // leaving the window fires no focusout.
   const AUTO_CLOSE_MS = 4000
   const bar = document.querySelector(".autoclose span")
   let closeTimer = null
   let closeStartedAt = 0
   let remaining = AUTO_CLOSE_MS
+  let pointerInside = false
+  let focusInside = false
+  let barAnimation = null
+
+  const startBar = (ms) => {
+    if (!bar) return
+    barAnimation?.cancel()
+    barAnimation = bar.animate(
+      [{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }],
+      { duration: ms, easing: "linear", fill: "forwards" },
+    )
+  }
+
+  const fireClose = () => {
+    closeTimer = null
+    remaining = 0
+    window.close()
+  }
 
   const scheduleClose = (ms) => {
     clearTimeout(closeTimer)
     closeStartedAt = Date.now()
     remaining = ms
-    if (bar) {
-      bar.style.animation = "none"
-      void bar.offsetWidth
-      bar.style.animation = ""
-      bar.style.animationDuration = `${ms}ms`
-    }
-    closeTimer = setTimeout(() => window.close(), ms)
+    startBar(ms)
+    closeTimer = setTimeout(fireClose, ms)
   }
 
   const pauseClose = () => {
     if (!closeTimer) return
     clearTimeout(closeTimer)
     closeTimer = null
-    remaining -= Date.now() - closeStartedAt
-    if (bar) bar.style.animationPlayState = "paused"
+    remaining = Math.max(remaining - (Date.now() - closeStartedAt), 0)
+    barAnimation?.pause()
   }
 
   const resumeClose = () => {
     if (closeTimer) return
-    scheduleClose(Math.max(remaining, 0))
+    closeStartedAt = Date.now()
+    barAnimation?.play()
+    closeTimer = setTimeout(fireClose, Math.max(remaining, 0))
   }
 
-  document.body.addEventListener("mouseenter", pauseClose)
-  document.body.addEventListener("mouseleave", resumeClose)
-  document.addEventListener("focusin", pauseClose)
-  document.addEventListener("focusout", (event) => {
-    if (!event.relatedTarget || !document.contains(event.relatedTarget)) {
+  const updateCloseState = () => {
+    if (pointerInside || focusInside) {
+      pauseClose()
+    } else {
       resumeClose()
     }
+  }
+
+  document.documentElement.addEventListener("pointerenter", () => {
+    pointerInside = true
+    updateCloseState()
+  })
+  document.documentElement.addEventListener("pointerleave", () => {
+    pointerInside = false
+    updateCloseState()
+  })
+  document.addEventListener("focusin", (event) => {
+    focusInside = event.target.matches(":focus-visible")
+    updateCloseState()
+  })
+  document.addEventListener("focusout", (event) => {
+    focusInside = Boolean(
+      event.relatedTarget instanceof Element &&
+        document.contains(event.relatedTarget) &&
+        event.relatedTarget.matches(":focus-visible"),
+    )
+    updateCloseState()
+  })
+  window.addEventListener("blur", () => {
+    focusInside = false
+    updateCloseState()
   })
   scheduleClose(AUTO_CLOSE_MS)
 })()

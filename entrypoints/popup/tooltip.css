@@ -57,8 +57,10 @@
   overflow-wrap: anywhere;
 }
 
-/* Drains over the 4s auto-close; main.js pauses and restarts it with the
-   timer while the pointer or focus is inside the popup. */
+/* Drains over the 4s auto-close. The JS timer owns it through the Web
+   Animations API: pausing freezes the current fill, resuming continues from
+   there. There is deliberately no CSS hover/focus pause rule, so the timer
+   stays the single source of truth. */
 .autoclose {
   height: 2px;
   margin: calc(var(--space-4) * -1) calc(var(--space-4) * -1) var(--space-1);
@@ -70,17 +72,7 @@
   height: 100%;
   background: var(--accent);
   transform-origin: left;
-  animation: autoclose-drain 4s linear forwards;
-}
-
-.popup:is(:hover, :focus-within) .autoclose span {
-  animation-play-state: paused;
-}
-
-@keyframes autoclose-drain {
-  to {
-    transform: scaleX(0);
-  }
+  transform: scaleX(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -151,7 +143,7 @@
 }
 
 .action {
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: 36px;
 }
 
