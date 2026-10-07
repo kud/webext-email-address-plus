@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.1] - 2026-10-07
+
+### Fixed
+
+- The toolbar icon is redrawn to sit with Firefox's own: the envelope and plus share one stroke weight, and on light toolbars it uses Firefox's toolbar ink, so it no longer looks faint beside its neighbours. ([acc2b5a](https://github.com/kud/webext-email-address-plus/commit/acc2b5a09ead126fadb1e2150276747835f0c321))
+
 ## [5.5.0] - 2026-10-07
 
 ### Added
