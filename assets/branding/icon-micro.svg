@@ -6,6 +6,6 @@
       <path d="M3 4.5 5.8 6.55a1.2 1.2 0 0 0 1.4 0L10 4.5" stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
     </mask>
   </defs>
-  <rect x="1" y="2" width="11" height="9" rx="2.5" fill="#1F6BFF" mask="url(#cut)"/>
+  <rect x="1" y="2" width="11" height="9" rx="2.5" fill="#0060DF" mask="url(#cut)"/>
   <path d="M11 9h2v6h-2zM9 11h6v2H9z" fill="#12BFA0"/>
 </svg>
