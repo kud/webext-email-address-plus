@@ -85,9 +85,9 @@ input[type="email"].invalid {
 }
 
 .choice input {
-  width: auto;
-  min-height: 0;
-  margin: 2px 0 0;
+  width: 16px;
+  height: 16px;
+  margin: calc((var(--text-base) * var(--line-base) - 16px) / 2) 0 0;
   accent-color: var(--accent);
 }
 
