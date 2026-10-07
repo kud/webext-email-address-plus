@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.1] - 2026-10-07
+
+### Changed
+
+- The Settings row now shows a gear on the left instead of a trailing chevron, since it opens the options page in a tab rather than a sub-view. ([16106cd](https://github.com/kud/webext-email-address-plus/commit/16106cdaf6d958cad90caea96a597bc926378e10))
+
+### Fixed
+
+- Popup auto-close is reliable: the progress bar and the timer no longer disagree, the bar no longer freezes after a hover, and a click no longer keeps the popup open for good. Hover or keyboard focus still pauses it. ([16106cd](https://github.com/kud/webext-email-address-plus/commit/16106cdaf6d958cad90caea96a597bc926378e10))
+- The "Label to add" radios on the options page now line up with their labels. ([b1d8850](https://github.com/kud/webext-email-address-plus/commit/b1d88503729744845de902fd77c2798d4a742b5f))
+
+### Security
+
+- Bumped the transitive `shell-quote` dependency to 1.11.0, closing a dev-tooling alert reached through `web-ext`. ([18758d0](https://github.com/kud/webext-email-address-plus/commit/18758d0d3cff492a926c8dabb81a6385eb147210))
+
+<details>
+<summary>Internal (1 commit)</summary>
+
+- Web preview demo reworked to run on live session storage.
+
+</details>
+
 ## [5.4.0] - 2026-10-07
 
 ### Changed
