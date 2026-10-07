@@ -1,31 +1,28 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="mailGrad" x1="74" y1="96" x2="360" y2="352" gradientUnits="userSpaceOnUse">
+    <linearGradient id="m-body" x1="32" y1="80" x2="400" y2="376" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#1593FF"/>
       <stop offset="1" stop-color="#284BFF"/>
     </linearGradient>
-    <linearGradient id="foldGrad" x1="74" y1="214" x2="245" y2="340" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#248DFF"/>
-      <stop offset="1" stop-color="#2039EE"/>
-    </linearGradient>
-    <linearGradient id="plusGrad" x1="281" y1="248" x2="370" y2="337" gradientUnits="userSpaceOnUse">
+    <linearGradient id="m-plus" x1="308" y1="280" x2="476" y2="448" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#28D3B5"/>
       <stop offset="1" stop-color="#12BFA0"/>
     </linearGradient>
-    <filter id="softShadow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0F172A" flood-opacity="0.10"/>
-    </filter>
+    <clipPath id="m-clip"><rect x="32" y="80" width="368" height="296" rx="56"/></clipPath>
+    <mask id="m-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect width="512" height="512" fill="#fff"/>
+      <path d="M392 306V422M334 364H450" stroke="#000" stroke-width="96" stroke-linecap="round"/>
+    </mask>
   </defs>
-  <g filter="url(#softShadow)">
-    <rect x="74" y="96" width="288" height="236" rx="44" fill="url(#mailGrad)"/>
-    <path d="M74 219L191 304C204 314 220 320 237 320H362V332H118C94 332 74 312 74 288V219Z" fill="url(#foldGrad)"/>
-    <path d="M104 144H332C342 144 350 152 350 162V175L242 255C228 266 208 266 194 255L86 175V162C86 152 94 144 104 144Z" fill="#F9FBFE"/>
-    <path d="M86 174L199 258C211 267 226 267 238 258L350 174" stroke="#233DE9" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M86 174V289" stroke="#233DE9" stroke-width="20" stroke-linecap="round"/>
-    <path d="M350 174V204" stroke="#233DE9" stroke-width="20" stroke-linecap="round"/>
-    <path d="M246 261C246 249 256 239 268 239H393C405 239 415 249 415 261V339C415 351 405 361 393 361H268C256 361 246 351 246 339V261Z" fill="#FCFDFE" stroke="#D8E2F0" stroke-width="2"/>
-    <path d="M246 304L279 281V319L246 304Z" fill="#FCFDFE"/>
-    <circle cx="286" cy="300" r="8.5" fill="#2B61F6"/>
-    <path d="M330 270C330 265 334 261 339 261H347C352 261 356 265 356 270V289H375C380 289 384 293 384 298V306C384 311 380 315 375 315H356V334C356 339 352 343 347 343H339C334 343 330 339 330 334V315H311C306 315 302 311 302 306V298C302 293 306 289 311 289H330V270Z" fill="url(#plusGrad)"/>
+  <g transform="translate(2 -8)">
+    <g mask="url(#m-cut)">
+      <g clip-path="url(#m-clip)">
+        <rect x="32" y="80" width="368" height="296" rx="56" fill="url(#m-body)"/>
+        <path d="M32 230L192 332Q216 346 246 346H400V376H32Z" fill="#2039EE" fill-opacity="0.55"/>
+        <path d="M90 114H342Q366 114 366 138V150L238 252Q216 268 194 252L66 150V138Q66 114 90 114Z" fill="#F9FBFE"/>
+        <path d="M66 150L194 252Q216 268 238 252L366 150" fill="none" stroke="#2039EE" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </g>
+    <path d="M392 306V422M334 364H450" stroke="url(#m-plus)" stroke-width="52" stroke-linecap="round"/>
   </g>
 </svg>
