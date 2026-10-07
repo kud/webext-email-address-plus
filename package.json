@@ -1,6 +1,6 @@
 {
   "name": "webext-email-address-plus",
-  "version": "5.4.1",
+  "version": "5.5.0",
   "description": "Automatically generate labeled email addresses for better organization and spam protection. Adds website-specific labels to your email when filling forms.",
   "private": true,
   "author": "kud",
