@@ -7,146 +7,8 @@ import { settings } from "../utils/settings"
 // it is callable from a browserAction click on Chrome and not on Firefox.
 const isChrome = () => typeof browser === "undefined"
 
-/* Handle Theme Detection and Icon Updates */
-const parseRGBColor = (colorString) => {
-  // Handle both rgb() and rgba() formats
-  const rgbMatch = colorString.match(/rgba?\(([^)]+)\)/)
-  if (!rgbMatch) return null
-
-  const values = rgbMatch[1].split(",").map((v) => parseFloat(v.trim()))
-  if (values.length < 3 || values.some(isNaN)) return null
-
-  // Return just the first 3 values (RGB, ignore alpha)
-  return [values[0], values[1], values[2]]
-}
-
-const calculateBrightness = (r, g, b) => {
-  // Using luminance formula
-  return (r * 299 + g * 587 + b * 114) / 1000
-}
-
-const updateIcon = async () => {
-  try {
-    let isDark = false
-
-    // Method 1: Try theme API (Firefox primarily)
-    try {
-      if (api.theme && api.theme.getCurrent) {
-        const theme = await api.theme.getCurrent()
-        console.log("Theme object:", theme)
-
-        // Check if we have theme colors
-        if (theme && theme.colors) {
-          const toolbarColor =
-            theme.colors.toolbar ||
-            theme.colors.frame ||
-            theme.colors.tab_background_text ||
-            "rgb(255, 255, 255)"
-          console.log("Found toolbar color:", toolbarColor)
-
-          if (toolbarColor.includes("rgb(")) {
-            const rgbValues = parseRGBColor(toolbarColor)
-            if (rgbValues) {
-              const [r, g, b] = rgbValues
-              const brightness = calculateBrightness(r, g, b)
-              isDark = brightness < 128
-              console.log(
-                "Theme API - RGB:",
-                r,
-                g,
-                b,
-                "Brightness:",
-                brightness,
-                "isDark:",
-                isDark,
-              )
-            }
-          } else if (toolbarColor.includes("#")) {
-            // Handle hex colors
-            const hex = toolbarColor.replace("#", "")
-            const r = parseInt(hex.substr(0, 2), 16)
-            const g = parseInt(hex.substr(2, 2), 16)
-            const b = parseInt(hex.substr(4, 2), 16)
-            const brightness = calculateBrightness(r, g, b)
-            isDark = brightness < 128
-            console.log(
-              "Theme API - Hex RGB:",
-              r,
-              g,
-              b,
-              "Brightness:",
-              brightness,
-              "isDark:",
-              isDark,
-            )
-          }
-        } else {
-          console.log("No theme colors found, trying system preference")
-          // Check system preference as fallback
-          if (typeof window !== "undefined" && window.matchMedia) {
-            isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-            console.log("System preference isDark:", isDark)
-          }
-        }
-      }
-    } catch (themeError) {
-      console.log("Theme API error:", themeError)
-      // Chrome fallback or when theme API fails
-      if (typeof window !== "undefined" && window.matchMedia) {
-        isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-        console.log("Fallback matchMedia isDark:", isDark)
-      }
-    }
-
-    const iconPath = isDark ? "icons/icon-dark.svg" : "icons/icon.svg"
-    console.log("Final decision - Using icon:", iconPath, "isDark:", isDark)
-
-    await api.browserAction.setIcon({
-      path: {
-        16: iconPath,
-        32: iconPath,
-        48: iconPath,
-      },
-    })
-
-    console.log("Icon set successfully to:", iconPath)
-  } catch (error) {
-    console.error("Icon update failed:", error)
-    try {
-      await api.browserAction.setIcon({ path: "icons/icon.svg" })
-      console.log("Fallback to default icon")
-    } catch (fallbackError) {
-      console.error("Fallback icon update failed:", fallbackError)
-    }
-  }
-}
-
-// Initialize
 const initialize = async () => {
   try {
-    // Set initial icon
-    await updateIcon()
-
-    // Update when theme changes
-    if (api.theme && api.theme.onUpdated) {
-      api.theme.onUpdated.addListener(updateIcon)
-    }
-
-    // Update when switching tabs (adaptive colors change per site)
-    if (api.tabs && api.tabs.onActivated) {
-      api.tabs.onActivated.addListener(updateIcon)
-    }
-
-    // Update when tab content changes
-    if (api.tabs && api.tabs.onUpdated) {
-      api.tabs.onUpdated.addListener((tabId, changeInfo) => {
-        if (changeInfo.status === "complete") {
-          // Small delay to let adaptive tab color do its thing
-          setTimeout(updateIcon, 100)
-        }
-      })
-    }
-
     // Set up click handler
     if (api.browserAction && api.browserAction.onClicked) {
       api.browserAction.onClicked.addListener(handleClick)
@@ -216,14 +78,16 @@ const generateLabel = (hostname, domainMode) => {
     case "main":
       if (hostnameArr.length >= 2) {
         // Handle common ccTLD patterns like .co.uk, .com.au, etc.
-        if (hostnameArr.length >= 3 && 
-            (hostnameArr[hostnameArr.length - 2] === "co" || 
-             hostnameArr[hostnameArr.length - 2] === "com" || 
-             hostnameArr[hostnameArr.length - 2] === "org" || 
-             hostnameArr[hostnameArr.length - 2] === "net" || 
-             hostnameArr[hostnameArr.length - 2] === "gov" || 
-             hostnameArr[hostnameArr.length - 2] === "edu" || 
-             hostnameArr[hostnameArr.length - 2] === "ac")) {
+        if (
+          hostnameArr.length >= 3 &&
+          (hostnameArr[hostnameArr.length - 2] === "co" ||
+            hostnameArr[hostnameArr.length - 2] === "com" ||
+            hostnameArr[hostnameArr.length - 2] === "org" ||
+            hostnameArr[hostnameArr.length - 2] === "net" ||
+            hostnameArr[hostnameArr.length - 2] === "gov" ||
+            hostnameArr[hostnameArr.length - 2] === "edu" ||
+            hostnameArr[hostnameArr.length - 2] === "ac")
+        ) {
           label = hostnameArr.slice(-3).join(".")
         } else {
           label = hostnameArr.slice(-2).join(".")

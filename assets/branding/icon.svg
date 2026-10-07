@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="m-body" x1="32" y1="80" x2="400" y2="376" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F8CFF"/>
+      <stop offset="1" stop-color="#0060DF"/>
+    </linearGradient>
+    <linearGradient id="m-plus" x1="308" y1="280" x2="476" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#28D3B5"/>
+      <stop offset="1" stop-color="#12BFA0"/>
+    </linearGradient>
+    <clipPath id="m-clip"><rect x="32" y="80" width="368" height="296" rx="56"/></clipPath>
+    <mask id="m-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect width="512" height="512" fill="#fff"/>
+      <path d="M392 306V422M334 364H450" stroke="#000" stroke-width="96" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <g transform="translate(2 -8)">
+    <g mask="url(#m-cut)">
+      <g clip-path="url(#m-clip)">
+        <rect x="32" y="80" width="368" height="296" rx="56" fill="url(#m-body)"/>
+        <path d="M32 230L192 332Q216 346 246 346H400V376H32Z" fill="#0049A8" fill-opacity="0.55"/>
+        <path d="M90 114H342Q366 114 366 138V150L238 252Q216 268 194 252L66 150V138Q66 114 90 114Z" fill="#F9FBFE"/>
+        <path d="M66 150L194 252Q216 268 238 252L366 150" fill="none" stroke="#0049A8" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </g>
+    <path d="M392 306V422M334 364H450" stroke="url(#m-plus)" stroke-width="52" stroke-linecap="round"/>
+  </g>
+</svg>
