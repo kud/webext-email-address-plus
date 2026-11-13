@@ -1,23 +1,34 @@
-# Email Address Plus - Browser Extension
+<div align="center">
 
-🚀 **Automatically generate labeled email addresses for better organization and spam protection.**
+<img src="assets/icon.svg" width="128" alt="Email Address Plus icon" />
 
-Email Address Plus adds website-specific labels to your email address when filling forms, making it easy to track where emails come from and organize your inbox.
+📧
 
-## ✨ Features
+# Email Address Plus
 
-- **🏷️ Smart Email Labeling**: Automatically adds "+website" labels to your email (e.g., `user+amazon@example.com`)
-- **🎯 Multiple Fill Methods**:
-  - Floating 📧 icon next to email inputs
-  - Right-click context menu
-  - Keyboard shortcut (Ctrl+Shift+Y / Cmd+Shift+Y)
-- **🎨 Visual Feedback**: Elegant blue glow animations confirm when fields are filled
-- **🌙 Theme Support**: Works seamlessly across light and dark browser themes
-- **🔒 Privacy Focused**: All processing happens locally - no data sent to external servers
-- **💡 Smart Guidance**: Helpful tooltips when extension needs configuration
-- **⚙️ Easy Setup**: Simple one-time configuration in extension settings
+![Firefox Add-on](https://img.shields.io/amo/v/email-address-plus?style=flat-square&logo=firefoxbrowser&logoColor=white&color=FF7139)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![MIT](https://img.shields.io/badge/licence-MIT-22C55E?style=flat-square)
 
-## 🚀 How It Works
+**Get a shiny email address with a ✌️ label ✌️ depending on the hostname**
+
+<a href="https://kud.io/projects/webext-email-address-plus">Website</a> · <a href="https://kud.io/projects/webext-email-address-plus/docs">Documentation</a>
+
+</div>
+
+## Features
+
+**Automatically generate labeled email addresses for better organization and spam protection.** Email Address Plus adds website-specific labels to your email address when filling forms, making it easy to track where emails come from and organize your inbox.
+
+- **Smart email labeling** — automatically adds "+website" labels to your email (e.g., `user+amazon@example.com`)
+- **Multiple fill methods** — a floating 📧 icon next to email inputs, a right-click context menu, or a keyboard shortcut (Ctrl+Shift+Y / Cmd+Shift+Y)
+- **Visual feedback** — elegant blue glow animations confirm when fields are filled
+- **Theme support** — works seamlessly across light and dark browser themes
+- **Privacy focused** — all processing happens locally, no data sent to external servers
+- **Smart guidance** — helpful tooltips when the extension needs configuration
+- **Easy setup** — simple one-time configuration in extension settings
+
+## How It Works
 
 1. **Configure**: Set your email address in the extension settings
 2. **Browse**: Visit any website with email input fields
@@ -26,14 +37,26 @@ Email Address Plus adds website-specific labels to your email address when filli
 
 Perfect for organizing newsletters, shopping accounts, and identifying spam sources.
 
-## 🔧 Installation
+## Install
 
-Install from your browser's extension store:
+### From Firefox Add-ons (remote)
 
-- **Firefox**: [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/email-address-plus/)
-- **Chrome**: Chrome Web Store (coming soon)
+[Email Address Plus on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/email-address-plus/)
 
-## 🎮 Usage
+Chrome Web Store: coming soon.
+
+### From source (local)
+
+```sh
+git clone https://github.com/kud/webext-email-address-plus.git
+cd webext-email-address-plus
+npm ci
+npm run build
+```
+
+Load it in Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → select `.output/firefox-mv2/manifest.json`. Temporary add-ons are dropped on restart and must be reloaded after every change.
+
+## Usage
 
 ### Method 1: Floating Icon
 
@@ -53,7 +76,7 @@ Install from your browser's extension store:
 - Press `Ctrl+Shift+Y` (Windows/Linux) or `Cmd+Shift+Y` (Mac)
 - Email is filled with website label
 
-## ⚙️ Configuration
+## Configuration
 
 1. Click the extension icon in your browser toolbar
 2. Enter your email address
@@ -62,13 +85,13 @@ Install from your browser's extension store:
    - **Main**: Uses main domain only (e.g., `user+example.com@domain.com`)
    - **Short**: Uses domain name only (e.g., `user+example@domain.com`)
 
-## 🤝 Compatibility
+## Compatibility
 
 - **Email Providers**: Gmail, Outlook, Yahoo, and any provider supporting plus-addressing
 - **Browsers**: Firefox, Chrome, Edge, and other Chromium-based browsers
 - **Websites**: Works with virtually all email input forms
 
-## 🛠️ Development
+## Development
 
 ```bash
 # Install the exact locked dependencies (Node 22 or later)
@@ -84,7 +107,7 @@ npm run build
 npm run lint
 ```
 
-## 🖼️ Web demo
+## Web demo
 
 `preview/` is the live demo: the real popup and options pages, exactly as they
 ship, side by side on one realistic set of invented `example.*` data, running
@@ -104,7 +127,7 @@ npm run build:preview
 
 The colour scheme follows the OS. `preview/fixtures/demo.json` holds the data.
 
-## 🏪 Updating the AMO listing
+## Updating the AMO listing
 
 The public add-on page (name, summary, description, categories and screenshots) lives in this repo: `amo/listing.json` for the text, `amo/screenshots/` for the previews (name-sorted, with an optional same-named `.txt` as the caption). The repo is the source of truth, so anything edited by hand on the AMO dashboard gets overwritten on the next push.
 
@@ -118,15 +141,15 @@ npx -y @kud/amo-cli@0.1.1 listing push --listing amo/listing.json --guid email-a
 
 Sending needs `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET` in the environment (the JWT issuer and secret from [AMO's API credentials page](https://addons.mozilla.org/en-US/developers/addon/api/key/)). The description is Markdown, which AMO renders on the page. The work is done by [`@kud/amo-cli`](https://kud.io/projects/amo-cli).
 
-## 📄 License
+## Licence
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙋 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/kud/webextension-email-address-plus/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/kud/webextension-email-address-plus/discussions)
 
----
-
 Made with ❤️ by [kud](https://github.com/kud)
+
+📚 **Full documentation → [webext-email-address-plus/docs](https://kud.io/projects/webext-email-address-plus/docs)**
