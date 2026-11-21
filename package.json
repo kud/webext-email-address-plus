@@ -18,6 +18,7 @@
     "dev": "wxt -b firefox",
     "build": "wxt build -b firefox",
     "zip": "wxt zip -b firefox",
+    "check:reproducible": "bash scripts/check-reproducible.sh",
     "postinstall": "wxt prepare",
     "lint": "web-ext lint --source-dir .output/firefox-mv2 --no-config-discovery",
     "preview": "vite --config preview/vite.config.js",
