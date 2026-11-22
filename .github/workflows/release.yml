@@ -1,8 +1,8 @@
 name: Release
 
-# Run by hand from main once the version bump is committed there, untagged.
-# The shared workflow checks the branch, the version and the tag, signs, and
-# then tags v<version> itself.
+# Run by hand from main once the version bump is committed there. The shared
+# workflow checks the branch, the version and the tag, signs, then tags
+# v<version> itself unless that tag already points at the released commit.
 
 on:
   workflow_dispatch:
