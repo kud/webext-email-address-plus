@@ -1,8 +1,20 @@
 name: Release
 
+# Run by hand from main once the version bump is committed there, untagged.
+# The shared workflow checks the branch, the version and the tag, signs, and
+# then tags v<version> itself.
+
 on:
-  push:
-    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, as committed in package.json"
+        required: true
+        type: string
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -24,4 +36,6 @@ jobs:
   release:
     needs: lint
     uses: kud/webext/.github/workflows/release-extension.yml@main
+    with:
+      version: ${{ inputs.version }}
     secrets: inherit
