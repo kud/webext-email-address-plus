@@ -2,8 +2,6 @@
 
 <img src="assets/icon.svg" width="128" alt="Email Address Plus icon" />
 
-📧
-
 # Email Address Plus
 
 ![Firefox Add-on](https://img.shields.io/amo/v/email-address-plus?style=flat-square&logo=firefoxbrowser&logoColor=white&color=FF7139)
